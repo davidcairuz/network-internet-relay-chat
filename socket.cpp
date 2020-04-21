@@ -33,7 +33,7 @@ void Socket::Bind(){
 	//IPV4
 	this->serv_addr.sin_family = AF_INET;
 	//Endereco do host em network byte order
-	this->serv_addr.sin_addr.s_addr = inet_addr((this->ip).c_str());
+	this->serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//inet_addr((this->ip).c_str());
 	//Port em network byte order
 	this->serv_addr.sin_port = htons(this->port);
 
@@ -44,12 +44,14 @@ void Socket::Bind(){
 		this->error.set_message("Could not bind with the server ;-;\n");
 		return;
 	}
+	cout << sock_fd << " " << conn_fd << "\n";
 }
 
 void Socket::Listen() {
 	cout << "Listening\n";
 
 	listen(this->sock_fd, 2);
+	cout << sock_fd << " " << conn_fd << "\n";
 }
 
 void Socket::Connect() {
@@ -72,6 +74,7 @@ void Socket::Connect() {
     
     this->connected = true;
 	if (this->connected == true) cout << "Na verdade conectou" << endl;
+	cout << sock_fd << " " << conn_fd << "\n";
 }
 
 Socket* Socket::Accept() {
@@ -87,7 +90,8 @@ Socket* Socket::Accept() {
 		this->error.set_message("Server didn't accept, sorry =(\n");
 		return new Socket();
 	}
-
+	this->conn_fd = connection_fd;
+	cout << sock_fd << " " << conn_fd << "\n";
 	return new Socket(connection_fd, received_addr);
 }
 
@@ -115,10 +119,10 @@ void Socket::Write(string msg) {
 	cout << "Writing\n";
 
 	char helper[buffer_size];
-	
 	bzero(helper, sizeof(helper));
 	strcpy(helper, msg.c_str());
-	write(this->sock_fd, helper, sizeof(helper));
+	cout << sock_fd << " " << conn_fd << "\n";
+	write(this->conn_fd, helper, sizeof(helper));
 }
 
 string Socket::Get_error(){

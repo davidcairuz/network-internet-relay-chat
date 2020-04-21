@@ -16,6 +16,7 @@ int main(int argc, char* argv[]) {
     check(socket);
     
     string message = socket->Read();
+    cout << message;
     cin >> message;
 
     socket->Write(message);

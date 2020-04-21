@@ -19,13 +19,15 @@ int main(int argc, char* argv[]){
     socket->Listen();
     check(socket);
 
-    socket = socket->Accept();
+    // socket = 
+    socket->Accept();
     check(socket);
     
     socket->Write("Type something here...\n");
     check(socket);
 
-    string message;
+    string message = socket->Read();
+    cout << message;
     cin >> message;
     
     socket->Write(message);
