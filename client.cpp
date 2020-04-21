@@ -1,21 +1,13 @@
 #include "socket.h"
 #include <algorithm>
 
-void check(Socket* socket) {
-    if (socket->Check_error()) {
-        cout << socket->Get_error();
-        delete socket;
-        exit(1);
-    }
-}
-
 int main(int argc, char* argv[]) {
 
     Socket* socket = new Socket(LOCALHOST);
-    check(socket);
+    socket->check();
 
     socket->Connect();
-    check(socket);
+    socket->check();
     
     string message = "";
 
@@ -23,6 +15,8 @@ int main(int argc, char* argv[]) {
 
         do {
             message = socket->Read();
+            socket->check();
+
             cout << "From server: " << message << "\n";
         } while (message.size() == Socket::buffer_size);
 
@@ -35,11 +29,10 @@ int main(int argc, char* argv[]) {
 
         for (int i = 0; i < message.size(); i += Socket::buffer_size) {
             socket->Write(message.substr(i, Socket::buffer_size));
-            check(socket);
+            socket->check();
         }
     }
     
     delete socket;
-
     return 0;
 }

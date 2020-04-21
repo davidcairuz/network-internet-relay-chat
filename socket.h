@@ -13,7 +13,7 @@
 
 #define LOCALHOST "127.0.0.1"
 #define DEFAULT_PORT 8080
-#define log 1
+#define log 0
 
 using namespace std;
 
@@ -29,7 +29,8 @@ private:
     Error error;
 
 public:
-    static const int buffer_size = 100;
+    static const int buffer_size = 4096;
+    
     Socket(string ip, string name="server", int port=DEFAULT_PORT);
     ~Socket();
     void Bind();
@@ -40,8 +41,9 @@ public:
     string Read();
     void Write(string msg);
 
+    void check();
     string Get_error();
-    bool Check_error();
+    bool has_error();
 };
 
 #endif

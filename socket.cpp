@@ -1,7 +1,7 @@
 #include "socket.h"
 
 Socket::Socket(string ip, string name, int port) {
-	if (log) cout << "Creating socket o/\n";
+	if (log) cout << "Creating socket\n";
 	
 	this->name = name;
 	this->port = port;
@@ -20,12 +20,12 @@ Socket::Socket(string ip, string name, int port) {
 }
 
 Socket::~Socket() {
-	if (log) cout << "Deleting socket =(\n";
+	if (log) cout << "Deleting socket(\n";
 	Disconnect();
 }
 
 void Socket::Bind(){
-	if (log) cout << "Binding socket =)\n";
+	if (log) cout << "Binding socket\n";
 	
 	//IPV4
 	this->serv_addr.sin_family = AF_INET;
@@ -44,13 +44,13 @@ void Socket::Bind(){
 }
 
 void Socket::Listen() {
-	if (log) cout << "Listening 0.0\n";
+	if (log) cout << "Listening\n";
 
 	listen(this->sock_fd, 2);
 }
 
 void Socket::Connect() {
-	if (log) cout << "Connecting socket XD\n";
+	if (log) cout << "Connecting socket\n";
 	
 	//IPV4
 	this->serv_addr.sin_family = AF_INET;
@@ -71,7 +71,7 @@ void Socket::Connect() {
 }
 
 void Socket::Accept() {
-	if (log) cout << "Accepting =P\n";
+	if (log) cout << "Accepting\n";
 	
 	sockaddr_in received_addr;
 	socklen_t addr_size = sizeof(received_addr);
@@ -88,7 +88,7 @@ void Socket::Accept() {
 }
 
 void Socket::Disconnect() {
-	if (log) cout << "Disconnecting =(\n";
+	if (log) cout << "Disconnecting\n";
 
 	int status = close(this->sock_fd);
 
@@ -99,7 +99,7 @@ void Socket::Disconnect() {
 }
 
 string Socket::Read() {
-	if (log) cout << "Reading =@\n";
+	if (log) cout << "Reading\n";
 
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));	
@@ -116,7 +116,7 @@ string Socket::Read() {
 }
 
 void Socket::Write(string msg) {
-	if (log) cout << "Writing =S\n";
+	if (log) cout << "Writing\n";
 
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));
@@ -130,10 +130,18 @@ void Socket::Write(string msg) {
 	}
 }
 
+void Socket::check() {
+    if (!this->has_error()) return;
+	
+	cout << this->Get_error();
+	delete this;
+	exit(1);
+}
+
 string Socket::Get_error(){
 	return this->error.get_message();
 }
 
-bool Socket::Check_error() {
+bool Socket::has_error() {
 	return this->error.has_occurred();
 }

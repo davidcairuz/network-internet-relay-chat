@@ -1,37 +1,31 @@
 #include "socket.h"
 #include <algorithm>
 
-void check(Socket* socket) {
-    if (socket->Check_error()) {
-        cout << socket->Get_error();
-        delete socket;
-        exit(1);
-    }
-}
-
 int main(int argc, char* argv[]){
     Socket* socket = new Socket("0.0.0.0", "1");
-    check(socket);
+    socket->check();
 
     socket->Bind();
-    check(socket);
+    socket->check();
 
     cout << "Chat Initialized =D\n";
 
     socket->Listen();
-    check(socket);
+    socket->check();
 
     socket->Accept();
-    check(socket);
+    socket->check();
     
     socket->Write("Type something: ");
-    check(socket);
-
+    socket->check();
+    
     string message = "";
     while (message != "/quit") {
         
         do {
             message = socket->Read();
+            socket->check();
+            
             cout << "From client: " << message << "\n";
         } while (message.size() == Socket::buffer_size);
 
@@ -44,7 +38,7 @@ int main(int argc, char* argv[]){
 
         for (int i = 0; i < message.size(); i += Socket::buffer_size) {
             socket->Write(message.substr(i, Socket::buffer_size));
-            check(socket);
+            socket->check();
         }
     }
 
