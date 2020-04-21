@@ -16,7 +16,8 @@ Socket::Socket(string ip, string name, int port) {
     }
 
     //zera o serv_addr
-    bzero(&serv_addr, sizeof(&serv_addr));
+	size_t size = sizeof(&serv_addr);
+    bzero(&serv_addr, size);
 }
 
 Socket::~Socket() {
@@ -24,13 +25,14 @@ Socket::~Socket() {
 	Disconnect();
 }
 
+
 void Socket::Bind(){
 	if (log) cout << "Binding socket\n";
 	
 	//IPV4
 	this->serv_addr.sin_family = AF_INET;
-	//Endereco do host em network byte order
-	this->serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);//inet_addr((this->ip).c_str());
+	//Manda o socket ouvir em todas as interfaces disponíveis
+	this->serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
 	//Port em network byte order
 	this->serv_addr.sin_port = htons(this->port);
 
@@ -43,18 +45,20 @@ void Socket::Bind(){
 	}
 }
 
+
 void Socket::Listen() {
 	if (log) cout << "Listening\n";
 
 	listen(this->sock_fd, 2);
 }
 
+
 void Socket::Connect() {
 	if (log) cout << "Connecting socket\n";
 	
 	//IPV4
 	this->serv_addr.sin_family = AF_INET;
-	//Endereco do host em network byte order
+	//Diz em que porta está o servidor a ser conectado
 	this->serv_addr.sin_addr.s_addr = inet_addr((this->ip).c_str());
 	//Port em network byte order
 	this->serv_addr.sin_port = htons(this->port);
@@ -69,6 +73,7 @@ void Socket::Connect() {
     
     this->connected = true;
 }
+
 
 void Socket::Accept() {
 	if (log) cout << "Accepting\n";

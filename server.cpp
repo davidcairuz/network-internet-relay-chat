@@ -32,11 +32,13 @@ int main(int argc, char* argv[]){
         if (message.size() == 0) break;        
 
         cout << "To client: ";
-        getline(cin, message, '\n');
+        do {
+            getline(cin, message, '\n');
+        } while (message.size() == 0); 
 
         if (message == "/quit") break;
 
-        for (int i = 0; i < message.size(); i += Socket::buffer_size) {
+        for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
             socket->Write(message.substr(i, Socket::buffer_size));
             socket->check();
         }

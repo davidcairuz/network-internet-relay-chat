@@ -31,19 +31,61 @@ private:
 public:
     static const int buffer_size = 4096;
     
+    /*
+     * Construtor do Socket
+     */
     Socket(string ip, string name="server", int port=DEFAULT_PORT);
     ~Socket();
+
+    /*
+     * Wrapper da função "bind" de C
+     */
     void Bind();
+
+    /*
+     * Wrapper da função "listen" de C
+     */
     void Listen();
+
+    /*
+     * Wrapper da função "connect" de C
+     */
     void Connect();
+    
+    /*
+     * Wrapper da função "accept" de C
+     */
     void Accept();
+    
+    /*
+     * Wrapper da função "disconnect" de C
+     */
     void Disconnect();
+    
+    /*
+     * Wrapper da função "read" de C
+     */
     string Read();
+    
+    /*
+     * Wrapper da função "write" de C
+     */
     void Write(string msg);
 
-    void check();
+    /*
+     * Getter da mensagem de erro
+     */
     string Get_error();
+    
+    /*
+     * Getter do status do erro
+     */
     bool has_error();
+
+    /*
+     * Encerra o programa caso exista um erro 
+     */
+    void check();
 };
 
 #endif
