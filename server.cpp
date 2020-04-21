@@ -3,44 +3,47 @@
 
 int main(int argc, char* argv[]){
     Socket* socket = new Socket("0.0.0.0", "1");
-    socket->check();
+    socket->Check();
 
     socket->Bind();
-    socket->check();
+    socket->Check();
 
     cout << "Chat Initialized =D\n";
 
     socket->Listen();
-    socket->check();
+    socket->Check();
 
     socket->Accept();
-    socket->check();
+    socket->Check();
     
-    socket->Write("Type something: ");
-    socket->check();
+    socket->Write("Type something...");
+    socket->Check();
     
     string message = "";
     while (message != "/quit") {
         
+        /* Garante que todas as mensagens enviadas serão recebidas */
         do {
             message = socket->Read();
-            socket->check();
+            socket->Check();
             
             cout << "From client: " << message << "\n";
         } while (message.size() == Socket::buffer_size);
 
         if (message.size() == 0) break;        
 
-        cout << "To client: ";
+        /* Espera o usuário digitar uma mensagem válida para enviar */
         do {
+            cout << "To client: ";
             getline(cin, message, '\n');
         } while (message.size() == 0); 
 
         if (message == "/quit") break;
 
+        /* Divide mensagens com mais de "buffer_size" caracteres e as envia em sequência */
         for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
             socket->Write(message.substr(i, Socket::buffer_size));
-            socket->check();
+            socket->Check();
         }
     }
 

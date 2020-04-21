@@ -18,21 +18,26 @@
 using namespace std;
 
 class Socket {
+
 private:
     int port;
     string ip;
     string name;
+    Error error;
     int sock_fd;
     int conn_fd;
-    bool connected = false;
+    bool connected;
     struct sockaddr_in serv_addr, client_addr;
-    Error error;
 
 public:
     static const int buffer_size = 4096;
     
     /*
      * Construtor do Socket
+     * 
+     * @param ip: ip utilizado para crirar o socket 
+     * @param name: nome do cliente
+     * @param port: porta na qual será criada o socket
      */
     Socket(string ip, string name="server", int port=DEFAULT_PORT);
     ~Socket();
@@ -63,29 +68,35 @@ public:
     void Disconnect();
     
     /*
-     * Wrapper da função "read" de C
+     * Recebe mensagem de outro socket
+     * 
+     * @return mensagem recebida
      */
     string Read();
     
     /*
-     * Wrapper da função "write" de C
+     * Envia uma mensagem para outro socket
+     * 
+     * @params msg: mensagem enviada
      */
     void Write(string msg);
 
     /*
      * Getter da mensagem de erro
+     * 
+     * @return mensagem de erro
      */
     string Get_error();
     
     /*
      * Getter do status do erro
      */
-    bool has_error();
+    bool Has_error();
 
     /*
-     * Encerra o programa caso exista um erro 
+     * Checa se há um erro e, caso haja, encerra o programa 
      */
-    void check();
+    void Check();
 };
 
 #endif

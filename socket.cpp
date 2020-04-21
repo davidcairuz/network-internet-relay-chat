@@ -3,6 +3,7 @@
 Socket::Socket(string ip, string name, int port) {
 	if (log) cout << "Creating socket\n";
 	
+	this->connected = false;
 	this->name = name;
 	this->port = port;
 	this->ip = ip;
@@ -15,25 +16,25 @@ Socket::Socket(string ip, string name, int port) {
         this->error.set_message("Could not create socket T.T\n");
     }
 
-    //zera o serv_addr
 	size_t size = sizeof(&serv_addr);
     bzero(&serv_addr, size);
 }
 
 Socket::~Socket() {
-	if (log) cout << "Deleting socket(\n";
 	Disconnect();
+	if (log) cout << "Deleting socket(\n";
 }
-
 
 void Socket::Bind(){
 	if (log) cout << "Binding socket\n";
 	
-	//IPV4
+	/* IPV4 */
 	this->serv_addr.sin_family = AF_INET;
-	//Manda o socket ouvir em todas as interfaces disponíveis
+
+	/* Manda o socket ouvir em todas as interfaces disponíveis */
 	this->serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	//Port em network byte order
+	
+	/* Port em network byte order */
 	this->serv_addr.sin_port = htons(this->port);
 
 	int status = bind(this->sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
@@ -52,15 +53,16 @@ void Socket::Listen() {
 	listen(this->sock_fd, 2);
 }
 
-
 void Socket::Connect() {
 	if (log) cout << "Connecting socket\n";
 	
-	//IPV4
+	/* IPV4 */
 	this->serv_addr.sin_family = AF_INET;
-	//Diz em que porta está o servidor a ser conectado
+	
+	/* Diz em que porta está o servidor a ser conectado */
 	this->serv_addr.sin_addr.s_addr = inet_addr((this->ip).c_str());
-	//Port em network byte order
+	
+	/* Port em network byte order */
 	this->serv_addr.sin_port = htons(this->port);
 
 	int status = connect(this->sock_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
@@ -99,7 +101,7 @@ void Socket::Disconnect() {
 
 	if (status == -1) {
 		this->error.set_occurred();
-		this->error.set_message("Could not disconnect... =(\n");
+		this->error.set_message("Could no´t disconnect... =(\n");
 	}
 }
 
@@ -109,9 +111,9 @@ string Socket::Read() {
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));	
 	
-	int status =  read(this->conn_fd, helper, sizeof(helper));
+	int status = read(this->conn_fd, helper, sizeof(helper));
 
-	if (status < 1) {
+	if (status == -1) {
 		this->error.set_occurred();
 		this->error.set_message("Could not read... =(\n");
 	}
@@ -135,8 +137,8 @@ void Socket::Write(string msg) {
 	}
 }
 
-void Socket::check() {
-    if (!this->has_error()) return;
+void Socket::Check() {
+    if (!this->Has_error()) return;
 	
 	cout << this->Get_error();
 	delete this;
@@ -147,6 +149,6 @@ string Socket::Get_error(){
 	return this->error.get_message();
 }
 
-bool Socket::has_error() {
+bool Socket::Has_error() {
 	return this->error.has_occurred();
 }
