@@ -26,10 +26,10 @@ private:
     int conn_fd;
     bool connected = false;
     struct sockaddr_in serv_addr, client_addr;
-    static const int buffer_size = 4096;
     Error error;
 
 public:
+    static const int buffer_size = 100;
     Socket(string ip, string name="server", int port=DEFAULT_PORT);
     ~Socket();
     void Bind();

@@ -23,20 +23,28 @@ int main(int argc, char* argv[]){
     socket->Accept();
     check(socket);
     
-    socket->Write("Type something here: ");
+    socket->Write("Type something: ");
     check(socket);
 
     string message = "";
     while (true) {
-        message = socket->Read();
-        cout << "From client: " << message << "\n";
+        
+        do {
+            message = socket->Read();
+            cout << "From client: " << message << "\n";
+        } while (message.size() == Socket::buffer_size);
+
+        if (message == "/quit") break;        
+
         cout << "To client: ";
         getline(cin, message, '\n');
-    
-        socket->Write(message);
-        check(socket);
 
         if (message == "/quit") break;
+
+        for (int i = 0; i < message.size(); i += Socket::buffer_size) {
+            socket->Write(message.substr(i, Socket::buffer_size));
+            check(socket);
+        }
     }
 
     delete socket;

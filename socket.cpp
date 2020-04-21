@@ -85,8 +85,6 @@ void Socket::Accept() {
 	}
 	
 	this->conn_fd = connection_fd;
-
-	// cout << sock_fd << " " << conn_fd << "\n";
 }
 
 void Socket::Disconnect() {
@@ -103,9 +101,9 @@ void Socket::Disconnect() {
 string Socket::Read() {
 	if (log) cout << "Reading =@\n";
 
-	char helper[buffer_size];
-	
+	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));	
+	
 	int status =  read(this->conn_fd, helper, sizeof(helper));
 
 	if (status == -1) {
@@ -120,9 +118,10 @@ string Socket::Read() {
 void Socket::Write(string msg) {
 	if (log) cout << "Writing =S\n";
 
-	char helper[buffer_size];
+	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));
 	strcpy(helper, msg.c_str());
+
 	int status = write(this->conn_fd, helper, sizeof(helper));
 
 	if (status == -1) {
