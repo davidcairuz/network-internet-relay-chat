@@ -2,9 +2,9 @@
 
 ## Membros
 
-- David Cairuz da Silva 10830061
-- João Guilherme Madeira Araújo 9725165
-- Luísa Souza Moura 10692179
+- David Cairuz da Silva - 10830061
+- João Guilherme Madeira Araújo - 9725165
+- Luísa Souza Moura - 10692179
 
 ## Sistema Operacional
 
@@ -25,7 +25,7 @@ O Makefile tem os seguintes comandos:
 - make error: compila os arquivos relacionados ao error
 - make clean: remove os arquivos binários e executáveis da pasta
 
-Para utilizat o sistema é preciso executar os arquivos na seguinte ordem:
+Para utilizar o sistema deve-se executar os arquivos na seguinte ordem:
 
 - Primeiramente é preciso executar o servidor, para isso é possível utilizar o comando make server
 - Em seguida executa-se o cliente, para isso é possível utilizar o comando make client
