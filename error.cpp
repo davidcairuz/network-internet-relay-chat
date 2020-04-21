@@ -8,6 +8,11 @@ int Error::set_occurred() {
     return this->occured;
 }
 
+int Error::set_not_occurred() {
+    this->occured = false;
+    return this->occured;
+}
+
 int Error::has_occurred() {
     return this->occured;
 }

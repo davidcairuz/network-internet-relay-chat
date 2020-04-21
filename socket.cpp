@@ -6,8 +6,8 @@ Socket::Socket(int port = DEFAULT_PORT, string ip = LOCALHOST) {
     this->ip = ip;
 
     this->sock_fd = socket(AF_INET, SOCK_STREAM, 0);
-
-    if (this->sock_fd == -1) {
+    
+	if (this->sock_fd == -1) {
         this->error.set_occurred();
         this->error.set_message("Could not create socket T.T\n");
     }
@@ -47,7 +47,7 @@ void Socket::Bind(){
 }
 
 void Socket::Listen() {
-	cout << "Listining\n";
+	cout << "Listening\n";
 
 	listen(this->sock_fd, 2);
 }
@@ -62,15 +62,16 @@ void Socket::Connect() {
 	//Port em network byte order
 	this->serv_addr.sin_port = htons(this->port);
 
-	int status = connect(this->sock_fd, (struct sockaddr *)&serv_addr, sizeof(serv_addr));
+	int status = connect(this->sock_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
-	if (status != 0) {
+	if (status == -1) {
 		this->error.set_occurred();
 		this->error.set_message("Could not connect with the server =(\n");
 		return;
 	}
     
     this->connected = true;
+	if (this->connected == true) cout << "Na verdade conectou" << endl;
 }
 
 Socket* Socket::Accept() {
@@ -126,4 +127,8 @@ string Socket::Get_error(){
 
 bool Socket::Check_error() {
 	return this->error.has_occurred();
+}
+
+void Socket::Set_not_error() {
+	this->error.set_not_occurred();
 }

@@ -13,6 +13,7 @@ class Error {
     public:
         Error();
         int set_occurred();
+        int set_not_occurred();
         int has_occurred();
 
         int set_message(string message);

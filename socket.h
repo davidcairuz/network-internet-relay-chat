@@ -42,6 +42,7 @@ public:
 
     string Get_error();
     bool Check_error();
+    void Set_not_error();
 };
 
 #endif
