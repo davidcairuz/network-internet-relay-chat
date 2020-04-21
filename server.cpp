@@ -4,6 +4,7 @@
 void check(Socket* socket) {
     if (socket->Check_error()) {
         cout << socket->Get_error();
+        delete socket;
         exit(1);
     }
 }
@@ -27,14 +28,14 @@ int main(int argc, char* argv[]){
     check(socket);
 
     string message = "";
-    while (true) {
+    while (message != "/quit") {
         
         do {
             message = socket->Read();
             cout << "From client: " << message << "\n";
         } while (message.size() == Socket::buffer_size);
 
-        if (message == "/quit") break;        
+        if (message.size() == 0) break;        
 
         cout << "To client: ";
         getline(cin, message, '\n');
@@ -48,7 +49,7 @@ int main(int argc, char* argv[]){
     }
 
     delete socket;
-    check(socket);
+    cout << "Bye o/\n";
 
     return 0;
 }

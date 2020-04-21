@@ -13,7 +13,7 @@
 
 #define LOCALHOST "127.0.0.1"
 #define DEFAULT_PORT 8080
-#define log 0
+#define log 1
 
 using namespace std;
 
@@ -42,7 +42,6 @@ public:
 
     string Get_error();
     bool Check_error();
-    void Set_not_error();
 };
 
 #endif

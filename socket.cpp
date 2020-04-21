@@ -106,7 +106,7 @@ string Socket::Read() {
 	
 	int status =  read(this->conn_fd, helper, sizeof(helper));
 
-	if (status == -1) {
+	if (status < 1) {
 		this->error.set_occurred();
 		this->error.set_message("Could not read... =(\n");
 	}
@@ -124,7 +124,7 @@ void Socket::Write(string msg) {
 
 	int status = write(this->conn_fd, helper, sizeof(helper));
 
-	if (status == -1) {
+	if (status < 1) {
 		this->error.set_occurred();
 		this->error.set_message("Could not write... =(\n");
 	}
@@ -136,8 +136,4 @@ string Socket::Get_error(){
 
 bool Socket::Check_error() {
 	return this->error.has_occurred();
-}
-
-void Socket::Set_not_error() {
-	this->error.set_not_occurred();
 }

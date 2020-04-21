@@ -4,6 +4,7 @@
 void check(Socket* socket) {
     if (socket->Check_error()) {
         cout << socket->Get_error();
+        delete socket;
         exit(1);
     }
 }
@@ -18,7 +19,7 @@ int main(int argc, char* argv[]) {
     
     string message = "";
 
-    while (true) {
+    while (message != "/quit") {
 
         do {
             message = socket->Read();
@@ -39,7 +40,6 @@ int main(int argc, char* argv[]) {
     }
     
     delete socket;
-    check(socket);
 
     return 0;
 }
