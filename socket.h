@@ -13,6 +13,7 @@
 
 #define LOCALHOST "127.0.0.1"
 #define DEFAULT_PORT 8080
+#define log 0
 
 using namespace std;
 
@@ -20,6 +21,7 @@ class Socket {
 private:
     int port;
     string ip;
+    string name;
     int sock_fd;
     int conn_fd;
     bool connected = false;
@@ -28,14 +30,12 @@ private:
     Error error;
 
 public:
-    Socket(int port, string ip);
-    Socket(int sock_fd, sockaddr_in serv_addr);
+    Socket(string ip, string name="server", int port=DEFAULT_PORT);
     ~Socket();
-    
     void Bind();
     void Listen();
     void Connect();
-    Socket* Accept();
+    void Accept();
     void Disconnect();
     string Read();
     void Write(string msg);

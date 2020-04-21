@@ -1,4 +1,5 @@
 #include "socket.h"
+#include <algorithm>
 
 void check(Socket* socket) {
     if (socket->Check_error()) {
@@ -9,18 +10,27 @@ void check(Socket* socket) {
 
 int main(int argc, char* argv[]) {
 
-    Socket* socket = new Socket(DEFAULT_PORT, LOCALHOST);
+    Socket* socket = new Socket(LOCALHOST);
     check(socket);
 
     socket->Connect();
     check(socket);
     
-    string message = socket->Read();
-    cout << message;
-    cin >> message;
+    string message = "";
 
-    socket->Write(message);
-    check(socket);
+    while (true) {
+        string message = socket->Read();
+        if (message == "/quit") break;        
+
+        cout << "From Server: " << message << "\n";
+        cout << "To Server: ";
+        getline(cin, message, '\n');
+        
+        if (message == "/quit") break;
+
+        socket->Write(message);
+        check(socket);
+    }
     
     delete socket;
     check(socket);
