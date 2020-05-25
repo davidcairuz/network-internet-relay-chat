@@ -77,7 +77,7 @@ void Socket::Connect() {
 }
 
 
-void Socket::Accept() {
+int Socket::Accept() {
 	if (log) cout << "Accepting\n";
 	
 	sockaddr_in received_addr;
@@ -88,10 +88,11 @@ void Socket::Accept() {
 	if (connection_fd == -1) {
 		this->error.set_occurred();
 		this->error.set_message("Server didn't accept, sorry =(\n");
-		return;
+		return -1;
 	}
 	
 	this->conn_fd = connection_fd;
+	return connection_fd;
 }
 
 void Socket::Disconnect() {
@@ -105,13 +106,13 @@ void Socket::Disconnect() {
 	}
 }
 
-string Socket::Read() {
+string Socket::Read(int conn_fd) {
 	if (log) cout << "Reading\n";
 
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));	
 	
-	int status = read(this->conn_fd, helper, sizeof(helper));
+	int status = read(conn_fd, helper, sizeof(helper));
 
 	if (status == -1) {
 		this->error.set_occurred();
@@ -136,6 +137,11 @@ void Socket::Write(string msg) {
 		this->error.set_message("Could not write... =(\n");
 	}
 }
+
+int Socket::Get_conn_fd() {
+	return this->conn_fd;
+}
+
 
 void Socket::Check() {
     if (!this->Has_error()) return;

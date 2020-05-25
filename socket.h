@@ -31,7 +31,9 @@ private:
 
 public:
     static const int buffer_size = 4096;
-    
+    static const int max_size = 65536;
+    static const int max_clients = 64;
+
     /*
      * Construtor do Socket
      * 
@@ -60,7 +62,7 @@ public:
     /*
      * Wrapper da função "accept" de C
      */
-    void Accept();
+    int Accept();
     
     /*
      * Wrapper da função "disconnect" de C
@@ -72,7 +74,7 @@ public:
      * 
      * @return mensagem recebida
      */
-    string Read();
+    string Read(int conn_fd);
     
     /*
      * Envia uma mensagem para outro socket
@@ -80,6 +82,8 @@ public:
      * @params msg: mensagem enviada
      */
     void Write(string msg);
+
+    int Get_conn_fd();
 
     /*
      * Getter da mensagem de erro
