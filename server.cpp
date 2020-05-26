@@ -45,6 +45,17 @@ void spread_message(string message, int speaker) {
     pthread_mutex_unlock(&lock);
 }
 
+void send_message(string message, int speaker) {
+    pthread_mutex_lock(&lock);
+
+    for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
+        socket_server->Write(message.substr(i, Socket::buffer_size), speaker);
+        socket_server->Check();
+    }
+
+    pthread_mutex_unlock(&lock);
+}
+
 void* server_thread(void* arg) {
     int new_client = *((int*)arg);
 
@@ -56,10 +67,12 @@ void* server_thread(void* arg) {
 
         if (message == "/quit") {
             remove_client(new_client);
-            message = "Someone left the server";
+            spread_message("Someone left the server", new_client);
+        } else if (message == "/ping") {
+            send_message("pong", new_client);
+        } else {
+            spread_message(message, new_client);
         }
-
-        spread_message(message, new_client);
     }
 
     cout << "Exit socket_thread" << endl;
