@@ -30,6 +30,8 @@ void* client_receive_thread(void* arg) {
                 break;
             }
 
+            message = "";
+
         } while (message.size() == Socket::buffer_size);
     }
 
@@ -92,7 +94,8 @@ string get_nickname() {
 int main(int argc, char* argv[]) {
     // signal(SIGINT, Sigint_handler); 
 
-    pthread_t tid;
+    pthread_t tid_receive;
+    pthread_t tid_send;
     string command = "";
     nickname = get_nickname();
     cout << get_menu();
@@ -109,12 +112,12 @@ int main(int argc, char* argv[]) {
     client_socket->Connect();
     client_socket->Check();
 
-    if (pthread_create(&tid, NULL, client_send_thread, NULL) != 0) {
+    if (pthread_create(&tid_send, NULL, client_send_thread, NULL) != 0) {
         cout << "Failed to create thread to send message" << endl;
         return 1;
     }
 
-    if (pthread_create(&tid, NULL, client_receive_thread, NULL) != 0) {
+    if (pthread_create(&tid_receive, NULL, client_receive_thread, NULL) != 0) {
         cout << "Failed to create thread to receive message" << endl;
         return 1;
     }

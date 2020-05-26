@@ -47,12 +47,10 @@ void spread_message(string message, int speaker) {
 
 void send_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
-
     for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
         socket_server->Write(message.substr(i, Socket::buffer_size), speaker);
         socket_server->Check();
     }
-
     pthread_mutex_unlock(&lock);
 }
 
@@ -65,10 +63,10 @@ void* server_thread(void* arg) {
         string message = socket_server->Read(new_client);
         socket_server->Check();
 
-        if (message.substr(message.size() - 5, 5) == "/quit") {
-            remove_client(new_client);
+        if (message.size() >= 5 && message.find("/quit") != string::npos) {
             spread_message("Someone left the server", new_client);
-        } else if (message.substr(message.size() - 5, 5) == "/ping") {
+            remove_client(new_client);
+        } else if (message.size() >= 5 && message.find("/ping") != string::npos) {
             send_message("pong", new_client);
         } else {
             spread_message(message, new_client);
@@ -76,8 +74,7 @@ void* server_thread(void* arg) {
     }
 
     cout << "Exit socket_thread" << endl;
-    close(new_client);
-    pthread_exit(NULL);    
+    pthread_exit(NULL);
 }
 
 int main(int argc, char* argv[]) {
@@ -92,8 +89,7 @@ int main(int argc, char* argv[]) {
     socket_server->Listen();
     socket_server->Check();
 
-    pthread_t tid[Socket::max_clients];
-    int num_threads = 0;
+    pthread_t tid;
 
     while (1) {
         int new_client = socket_server->Accept();
@@ -106,7 +102,7 @@ int main(int argc, char* argv[]) {
 
         insert_client(new_client);
 
-        if (pthread_create(&tid[num_threads], NULL, server_thread, &new_client) != 0)
+        if (pthread_create(&tid, NULL, server_thread, &new_client) != 0)
             cout << "Failed to create thread" << endl;
     }
 
