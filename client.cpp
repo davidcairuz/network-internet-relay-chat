@@ -34,14 +34,14 @@ void* client_send_thread(void* arg) {
     while (!quit) {
         getline(cin, message, '\n');
 
-        if (message == "/quit") {
-            quit = true;
-            break;
-        }
-
         for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
             client_socket->Write(message.substr(i, Socket::buffer_size));
             client_socket->Check();
+        }
+
+        if (message == "/quit") {
+            quit = true;
+            break;
         }
     }
 

@@ -15,6 +15,21 @@ vector<int> clients;
 //     fflush(stdout);
 // }
 
+void insert_client(int new_client) {
+    pthread_mutex_lock(&lock);
+    clients.push_back(new_client);
+    active_clients++;
+    pthread_mutex_unlock(&lock);
+}
+
+void remove_client(int client) {
+    pthread_mutex_lock(&lock);
+    auto pos = find(clients.begin(), clients.end(), client);
+    clients.erase(pos);
+    active_clients--;
+    pthread_mutex_unlock(&lock);
+}
+
 void spread_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
 
@@ -38,25 +53,18 @@ void* server_thread(void* arg) {
     while (!quit) {
         string message = socket_server->Read(new_client);
         socket_server->Check();
+
+        if (message == "/quit") {
+            remove_client(new_client);
+            message = "Someone left the server";
+        }
+
         spread_message(message, new_client);
     }
 
     cout << "Exit socket_thread" << endl;
     close(new_client);
     pthread_exit(NULL);    
-}
-
-void insert_client(int new_client) {
-    pthread_mutex_lock(&lock);
-    clients.push_back(new_client);
-    pthread_mutex_unlock(&lock);
-}
-
-void remove_client(int client) {
-    pthread_mutex_lock(&lock);
-    auto pos = find(clients.begin(), clients.end(), client);
-    clients.erase(pos);
-    pthread_mutex_unlock(&lock);
 }
 
 int main(int argc, char* argv[]) {
