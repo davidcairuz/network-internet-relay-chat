@@ -101,7 +101,6 @@ int main(int argc, char* argv[]) {
         
         if (active_clients == Socket::max_clients) {
             socket_server->Write("Too many people here, you are not welcome\n");
-            close(new_client);
             continue;
         } 
 

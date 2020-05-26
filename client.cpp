@@ -24,6 +24,12 @@ void* client_receive_thread(void* arg) {
             message = client_socket->Read(client_socket->Get_conn_fd());
             client_socket->Check();
             cout << message << "\n";
+
+            if (message == "Too many people here, you are not welcome\n") {
+                quit = true;
+                break;
+            }
+
         } while (message.size() == Socket::buffer_size);
     }
 
