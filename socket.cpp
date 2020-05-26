@@ -128,6 +128,7 @@ void Socket::Write(string msg, int conn_fd) {
 
 	// Default conn_fd
 	if (conn_fd == -1) conn_fd = this->conn_fd;
+	if (this->name != "server") msg = this->name + ": " + msg;
 
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));

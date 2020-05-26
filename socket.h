@@ -32,7 +32,7 @@ private:
 public:
     static const int buffer_size = 4096;
     static const int max_size = 65536;
-    static const int max_clients = 1;
+    static const int max_clients = 64;
 
     /*
      * Construtor do Socket

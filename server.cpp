@@ -3,7 +3,7 @@
 #include <vector>
 #include <pthread.h>
 
-Socket* socket_server = new Socket("0.0.0.0", "1");
+Socket* socket_server = new Socket("0.0.0.0");
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 int active_clients = 0;
 bool quit = false;
@@ -65,10 +65,10 @@ void* server_thread(void* arg) {
         string message = socket_server->Read(new_client);
         socket_server->Check();
 
-        if (message == "/quit") {
+        if (message.substr(message.size() - 5, 5) == "/quit") {
             remove_client(new_client);
             spread_message("Someone left the server", new_client);
-        } else if (message == "/ping") {
+        } else if (message.substr(message.size() - 5, 5) == "/ping") {
             send_message("pong", new_client);
         } else {
             spread_message(message, new_client);

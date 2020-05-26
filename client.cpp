@@ -64,10 +64,28 @@ void* client_send_thread(void* arg) {
     pthread_exit(NULL);
 }
 
+bool check_letter(char letter) {
+    return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z') || (letter  == '.') || (letter == '_') || letter == '-';
+}
+
+bool check_username(string username) {
+    if (username.size() <= 2) return false;
+    for (char letter : username) {
+        if (!check_letter(letter)) return false;
+    }
+    return true;
+}
+
 string get_nickname() {
     string nickname = "";
-    cout << "Type your nickname: ";
+    cout << "Type your nickname (a-z, A-Z, ., _, -): ";
     getline(cin, nickname);
+    
+    while (!check_username(nickname)) {
+        cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2): ";
+        getline(cin, nickname);
+    }
+
     return nickname;
 }
 
@@ -79,7 +97,11 @@ int main(int argc, char* argv[]) {
     nickname = get_nickname();
     cout << get_menu();
 
-    while (command != "/connect") getline(cin, command);
+    while (command != "/connect") {
+        getline(cin, command);
+        if (command == "/menu") cout << get_menu();
+        else if(command == "/quit") exit(0);
+    }
 
     client_socket = new Socket(LOCALHOST, nickname);
     client_socket->Check();
