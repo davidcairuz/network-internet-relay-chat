@@ -6,18 +6,10 @@ string nickname = "";
 bool quit = false;
 Socket* client_socket;
 
-
 void Sigint_handler(int sig_num) {
     signal(SIGINT, Sigint_handler);
     cout << "\nCannot quit using crtl+c\n";
     fflush(stdout);
-}
-
-void eof_handler(int sig_num) {
-    signal(EOF, eof_handler);
-    cout << "\nQuitting, bye o/\n";
-    fflush(stdout);
-    exit(0);
 }
 
 string get_menu() {
@@ -32,15 +24,19 @@ void* client_receive_thread(void* arg) {
             message = client_socket->Read(client_socket->Get_conn_fd());
             client_socket->Check();
             cout << message << "\n";
-
+            
             if (message == "Too many people here, you are not welcome\n") {
+                quit = true;
+                break;
+            } else if (message.empty()) {
+                cout << "Server is down" << endl;
                 quit = true;
                 break;
             }
 
             message = "";
 
-        } while (message.size() == Socket::buffer_size);
+        } while (message.size() == Socket::buffer_size && !quit);
     }
 
     delete client_socket;
@@ -49,6 +45,7 @@ void* client_receive_thread(void* arg) {
 
 void* client_send_thread(void* arg) {
     cout << "Connected to server" << endl;
+    client_socket->Write(nickname);
     string message = "";
 
     while (!quit) {
@@ -69,7 +66,6 @@ void* client_send_thread(void* arg) {
 
         if (message == "/quit") {
             quit = true;
-            break;
         }
     }
 
@@ -83,6 +79,8 @@ bool check_letter(char letter) {
 
 bool check_username(string username) {
     if (username.size() <= 2) return false;
+    if (username == "server") return false;
+
     for (char letter : username) {
         if (!check_letter(letter)) return false;
     }
@@ -91,7 +89,8 @@ bool check_username(string username) {
 
 string get_nickname() {
     string nickname = "";
-    cout << "Type your nickname (a-z, A-Z, ., _, -): ";
+    cout << "Type your nickname (a-z, A-Z, ., _, -, size > 2): ";
+    
     if(!getline(cin, nickname)) {
         cout << "Quitting" << endl;
         exit(0);
@@ -108,15 +107,14 @@ string get_nickname() {
     return nickname;
 }
 
-
 int main(int argc, char* argv[]) {
     signal(SIGINT, Sigint_handler);
-    signal(EOF, eof_handler);
 
     pthread_t tid_receive;
     pthread_t tid_send;
     string command = "";
-    nickname = get_nickname();
+    
+    nickname = get_nickname();    
     cout << get_menu();
 
     while (command != "/connect") {

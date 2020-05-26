@@ -33,6 +33,7 @@ public:
     static const int buffer_size = 4096;
     static const int max_size = 65536;
     static const int max_clients = 64;
+    static const int max_retries = 5;
 
     /*
      * Construtor do Socket
@@ -81,7 +82,7 @@ public:
      * 
      * @params msg: mensagem enviada
      */
-    void Write(string msg, int conn_fd = -1);
+    int Write(string msg, int conn_fd = -1, string id = "default");
 
     int Get_conn_fd();
 

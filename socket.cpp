@@ -46,7 +46,6 @@ void Socket::Bind(){
 	}
 }
 
-
 void Socket::Listen() {
 	if (log) cout << "Listening\n";
 
@@ -75,7 +74,6 @@ void Socket::Connect() {
     
     this->connected = true;
 }
-
 
 int Socket::Accept() {
 	if (log) cout << "Accepting\n";
@@ -110,7 +108,7 @@ string Socket::Read(int conn_fd) {
 	if (log) cout << "Reading\n";
 
 	char helper[buffer_size + 1];
-	bzero(helper, sizeof(helper));	
+	bzero(helper, sizeof(helper));
 	
 	int status = read(conn_fd, helper, sizeof(helper));
 
@@ -123,12 +121,11 @@ string Socket::Read(int conn_fd) {
 	return ret;
 }
 
-void Socket::Write(string msg, int conn_fd) {
+int Socket::Write(string msg, int conn_fd, string id) {
 	if (log) cout << "Writing\n";
 
 	// Default conn_fd
 	if (conn_fd == -1) conn_fd = this->conn_fd;
-	if (this->name != "server") msg = this->name + ": " + msg;
 
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));
@@ -140,12 +137,13 @@ void Socket::Write(string msg, int conn_fd) {
 		this->error.set_occurred();
 		this->error.set_message("Could not write... =(\n");
 	}
+
+	return status;
 }
 
 int Socket::Get_conn_fd() {
 	return this->conn_fd;
 }
-
 
 void Socket::Check() {
     if (!this->Has_error()) return;
