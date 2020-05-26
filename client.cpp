@@ -8,58 +8,81 @@
 //     fflush(stdout); 
 // }
 
-void* client_thread(void* arg) {
-    cout << "Connected to server" << endl;
-    Socket* socket = new Socket(LOCALHOST);
-    socket->Check();
+string nickname = "";
+bool quit = false;
+Socket* client_socket;
 
-    socket->Connect();
-    socket->Check();
-
+void* client_receive_thread(void* arg) {
     string message = "";
-    /* Espera o usuário digitar uma mensagem válida para enviar */
-    do {
-        cout << "To Server: ";
-        getline(cin, message, '\n');
-    } while (message == ""); 
 
-    if (message == "/quit") {
-        delete socket;
-        pthread_exit(NULL);
+    while (!quit) {
+        do {
+            message = client_socket->Read(client_socket->Get_conn_fd());
+            client_socket->Check();
+            cout << message << "\n";
+        } while (message.size() == Socket::buffer_size);
     }
 
-    /*Divide mensagens com mais de "buffer_size" caracteres e as envia em sequência*/
-    for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
-        socket->Write(message.substr(i, Socket::buffer_size));
-        socket->Check();
-    }
-
-    /* Garante que todas as mensagens enviadas serão recebidas */        
-    do {
-        message = socket->Read(socket->Get_conn_fd());
-        socket->Check();
-
-        cout << "From server: " << message << "\n";
-    } while (message.size() == Socket::buffer_size);
-
-    delete socket;
+    delete client_socket;
     pthread_exit(NULL);
+}
+
+void* client_send_thread(void* arg) {
+    cout << "Connected to server" << endl;
+    string message = "";
+
+    while (!quit) {
+        getline(cin, message, '\n');
+
+        if (message == "/quit") {
+            quit = true;
+            break;
+        }
+
+        for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
+            client_socket->Write(message.substr(i, Socket::buffer_size));
+            client_socket->Check();
+        }
+    }
+
+    delete client_socket;
+    pthread_exit(NULL);
+}
+
+string get_nickname() {
+    string nickname = "";
+    cout << "Type your nickname: ";
+    getline(cin, nickname);
+    return nickname;
 }
 
 int main(int argc, char* argv[]) {
     // signal(SIGINT, Sigint_handler); 
 
     pthread_t tid;
-
     string command = "";
+    nickname = get_nickname();
 
     while (command != "/connect") getline(cin, command);
 
-    if (pthread_create(&tid, NULL, client_thread, NULL) != 0) {
-        cout << "Failed to create thread" << endl;
+    client_socket = new Socket(LOCALHOST, nickname);
+    client_socket->Check();
+
+    client_socket->Connect();
+    client_socket->Check();
+
+    if (pthread_create(&tid, NULL, client_send_thread, NULL) != 0) {
+        cout << "Failed to create thread to send message" << endl;
+        return 1;
     }
 
-    pthread_join(tid, NULL);
-    
+    if (pthread_create(&tid, NULL, client_receive_thread, NULL) != 0) {
+        cout << "Failed to create thread to receive message" << endl;
+        return 1;
+    }
+
+    while (!quit);
+
+    cout << "É nois flw vlw" << endl;    
     return 0;
 }

@@ -81,7 +81,7 @@ public:
      * 
      * @params msg: mensagem enviada
      */
-    void Write(string msg);
+    void Write(string msg, int conn_fd = -1);
 
     int Get_conn_fd();
 

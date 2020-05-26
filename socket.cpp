@@ -50,7 +50,7 @@ void Socket::Bind(){
 void Socket::Listen() {
 	if (log) cout << "Listening\n";
 
-	listen(this->sock_fd, 2);
+	listen(this->sock_fd, max_clients);
 }
 
 void Socket::Connect() {
@@ -123,14 +123,17 @@ string Socket::Read(int conn_fd) {
 	return ret;
 }
 
-void Socket::Write(string msg) {
+void Socket::Write(string msg, int conn_fd) {
 	if (log) cout << "Writing\n";
+
+	// Default conn_fd
+	if (conn_fd == -1) conn_fd = this->conn_fd;
 
 	char helper[buffer_size + 1];
 	bzero(helper, sizeof(helper));
 	strcpy(helper, msg.c_str());
 
-	int status = write(this->conn_fd, helper, sizeof(helper));
+	int status = write(conn_fd, helper, sizeof(helper));
 
 	if (status < 1) {
 		this->error.set_occurred();

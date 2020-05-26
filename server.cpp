@@ -1,9 +1,13 @@
 #include "socket.h"
 #include <algorithm>
+#include <vector>
 #include <pthread.h>
 
 Socket* socket_server = new Socket("0.0.0.0", "1");
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+int active_clients = 0;
+bool quit = false;
+vector<int> clients;
 
 // void Sigint_handler(int sig_num) {
 //     signal(SIGINT, Sigint_handler);
@@ -11,37 +15,48 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 //     fflush(stdout);
 // }
 
-void* socket_thread(void* arg) {
-    int new_client = *((int*)arg);    
+void spread_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
 
-    /* Garante que todas as mensagens enviadas serão recebidas */
-    string message = "";
-    do {
-        message = socket_server->Read(new_client);
-        socket_server->Check();
+    for (int client : clients) {
+        if (client == speaker) continue;
         
-        cout << new_client << ": " << message << "\n";
-    } while (message.size() == Socket::buffer_size);
+        for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
+            socket_server->Write(message.substr(i, Socket::buffer_size), client);
+            socket_server->Check();
+        }
+    }
 
     pthread_mutex_unlock(&lock);
-    sleep(2);
+}
 
-    /* Espera o usuário digitar uma mensagem válida para enviar */
-    do {
-        cout << "To client: ";
-        getline(cin, message, '\n');
-    } while (message.size() == 0); 
+void* server_thread(void* arg) {
+    int new_client = *((int*)arg);
 
-    /* Divide mensagens com mais de "buffer_size" caracteres e as envia em sequência */
-    for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
-        socket_server->Write(message.substr(i, Socket::buffer_size));
+    spread_message("A new client has joined us!", new_client);
+
+    while (!quit) {
+        string message = socket_server->Read(new_client);
         socket_server->Check();
+        spread_message(message, new_client);
     }
 
     cout << "Exit socket_thread" << endl;
     close(new_client);
-    pthread_exit(NULL);
+    pthread_exit(NULL);    
+}
+
+void insert_client(int new_client) {
+    pthread_mutex_lock(&lock);
+    clients.push_back(new_client);
+    pthread_mutex_unlock(&lock);
+}
+
+void remove_client(int client) {
+    pthread_mutex_lock(&lock);
+    auto pos = find(clients.begin(), clients.end(), client);
+    clients.erase(pos);
+    pthread_mutex_unlock(&lock);
 }
 
 int main(int argc, char* argv[]) {
@@ -63,14 +78,16 @@ int main(int argc, char* argv[]) {
         int new_client = socket_server->Accept();
         socket_server->Check();        
         
-        if (pthread_create(&tid[num_threads], NULL, socket_thread, &new_client) != 0)
-            cout << "Failed to create thread" << endl;
+        if (active_clients == Socket::max_clients) {
+            socket_server->Write("Too many people here, you are not welcome\n");
+            close(new_client);
+            continue;
+        } 
 
-        if (num_threads >= Socket::max_clients * 0.9) {
-            num_threads = 0;
-            while (num_threads < Socket::max_clients * 0.9) pthread_join(tid[num_threads++], NULL);
-            num_threads = 0;
-        }
+        insert_client(new_client);
+
+        if (pthread_create(&tid[num_threads], NULL, server_thread, &new_client) != 0)
+            cout << "Failed to create thread" << endl;
     }
 
     return 0;
