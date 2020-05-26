@@ -75,11 +75,18 @@ void* server_thread(void* arg) {
         string message = socket_server->Read(new_client);
         socket_server->Check();
 
-        if (message.size() == 5 && message.substr(message.size() - 5, 5) == "/quit") {
+        if (message == "/quit") {
             spread_message("Someone left the server", new_client);
             remove_client(new_client);
-        } else if (message.size() == 5 && message.substr(message.size() - 5, 5) == "/ping") {
+
+        } else if (message == "/ping") {
             send_message("pong", new_client);
+
+        } else if(message.size() >= 9 && message.substr(0, 9) == "/nickname") {
+            string new_nickname = message.substr(10, message.size());
+            auto pos = find(clients.begin(), clients.end(), new_client) - clients.begin();
+            ids[pos].second = new_nickname;
+        
         } else {
             spread_message(message, new_client);
         }

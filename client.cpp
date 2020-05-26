@@ -13,7 +13,41 @@ void Sigint_handler(int sig_num) {
 }
 
 string get_menu() {
-    return "-------- Options -------- \n /connect: Connects to server \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n";
+    return "-------- Options -------- \n /connect: Connects to server \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n";
+}
+
+bool check_letter(char letter) {
+    return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z') || (letter  == '.') || (letter == '_') || letter == '-';
+}
+
+bool check_username(string username) {
+    if (username.size() <= 2) return false;
+    if (username == "server") return false;
+
+    for (char letter : username) {
+        if (!check_letter(letter)) return false;
+    }
+    return true;
+}
+
+string get_nickname() {
+    string nickname = "";
+    cout << "Type your nickname (a-z, A-Z, ., _, -, size > 2): ";
+    
+    if(!getline(cin, nickname)) {
+        cout << "Quitting" << endl;
+        exit(0);
+    }
+    
+    while (!check_username(nickname)) {
+        cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2): ";
+        if(!getline(cin, nickname)) {
+           cout << "Quitting" << endl;
+           exit(0);
+        }
+    }
+
+    return nickname;
 }
 
 void* client_receive_thread(void* arg) {
@@ -57,6 +91,16 @@ void* client_send_thread(void* arg) {
         if (message == "/menu") {
             cout << get_menu();
             continue;
+        } else if(message.size() >= 9 && message.substr(0, 9) == "/nickname") {
+            if (message.size () < 12) 
+                cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";
+            
+            string new_nickname = message.substr(10, message.size());
+            
+            if (check_username(nickname)) {
+                nickname = new_nickname;
+                cout << "Nickname updated to: " << nickname << endl;        
+            }
         }
 
         for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
@@ -71,40 +115,6 @@ void* client_send_thread(void* arg) {
 
     delete client_socket;
     pthread_exit(NULL);
-}
-
-bool check_letter(char letter) {
-    return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z') || (letter  == '.') || (letter == '_') || letter == '-';
-}
-
-bool check_username(string username) {
-    if (username.size() <= 2) return false;
-    if (username == "server") return false;
-
-    for (char letter : username) {
-        if (!check_letter(letter)) return false;
-    }
-    return true;
-}
-
-string get_nickname() {
-    string nickname = "";
-    cout << "Type your nickname (a-z, A-Z, ., _, -, size > 2): ";
-    
-    if(!getline(cin, nickname)) {
-        cout << "Quitting" << endl;
-        exit(0);
-    }
-    
-    while (!check_username(nickname)) {
-        cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2): ";
-        if(!getline(cin, nickname)) {
-           cout << "Quitting" << endl;
-           exit(0);
-        }
-    }
-
-    return nickname;
 }
 
 int main(int argc, char* argv[]) {
@@ -123,8 +133,22 @@ int main(int argc, char* argv[]) {
             exit(0);
         }
 
-        if (command == "/menu") cout << get_menu();
-        else if(command == "/quit") exit(0);
+        if (command == "/menu") 
+            cout << get_menu();
+        else if(command == "/quit") 
+            exit(0);
+        else if(command == "/ping") 
+            cout << "You've got to be connected!";
+        else if(command.size() >= 9 && command.substr(0, 9) == "/nickname") {
+            if (command.size () < 12) 
+                cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";
+            
+            string new_nickname = command.substr(10, command.size());
+            if (check_username(nickname)) {
+                nickname = new_nickname;
+                cout << "Nickname updated to: " << nickname << endl;        
+            }
+        }
     }
 
     client_socket = new Socket(LOCALHOST, nickname);

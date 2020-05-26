@@ -141,6 +141,10 @@ int Socket::Write(string msg, int conn_fd, string id) {
 	return status;
 }
 
+void Socket::Update_nickname(string nickname) {
+	this->name = nickname;
+}
+
 int Socket::Get_conn_fd() {
 	return this->conn_fd;
 }

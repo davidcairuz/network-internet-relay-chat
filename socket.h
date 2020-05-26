@@ -86,6 +86,8 @@ public:
 
     int Get_conn_fd();
 
+    void Update_nickname(string nickname);
+
     /*
      * Getter da mensagem de erro
      * 
