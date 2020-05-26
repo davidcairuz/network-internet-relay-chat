@@ -9,11 +9,19 @@ int active_clients = 0;
 bool quit = false;
 vector<int> clients;
 
-// void Sigint_handler(int sig_num) {
-//     signal(SIGINT, Sigint_handler);
-//     cout << "\nCannot quit using crtl+c\n";
-//     fflush(stdout);
-// }
+void Sigint_handler(int sig_num) {
+    signal(SIGINT, Sigint_handler);
+    cout << "\nCannot quit using crtl+c\n";
+    fflush(stdout);
+}
+
+void eof_handler(int sig_num) {
+    signal(EOF, eof_handler);
+    cout << "\nQuitting Server\n";
+    delete socket_server;
+    fflush(stdout);
+    exit(0);
+}
 
 void insert_client(int new_client) {
     pthread_mutex_lock(&lock);
@@ -78,7 +86,9 @@ void* server_thread(void* arg) {
 }
 
 int main(int argc, char* argv[]) {
-    // signal(SIGINT, Sigint_handler);
+    signal(SIGINT, Sigint_handler);
+    signal(EOF, eof_handler);
+
     socket_server->Check();
 
     socket_server->Bind();

@@ -2,15 +2,23 @@
 #include <algorithm>
 #include <pthread.h>
 
-// void Sigint_handler(int sig_num) {
-//     signal(SIGINT, Sigint_handler);
-//     cout << "\nCannot quit using crtl+c\n";
-//     fflush(stdout); 
-// }
-
 string nickname = "";
 bool quit = false;
 Socket* client_socket;
+
+
+void Sigint_handler(int sig_num) {
+    signal(SIGINT, Sigint_handler);
+    cout << "\nCannot quit using crtl+c\n";
+    fflush(stdout);
+}
+
+void eof_handler(int sig_num) {
+    signal(EOF, eof_handler);
+    cout << "\nQuitting, bye o/\n";
+    fflush(stdout);
+    exit(0);
+}
 
 string get_menu() {
     return "-------- Options -------- \n /connect: Connects to server \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n";
@@ -44,7 +52,10 @@ void* client_send_thread(void* arg) {
     string message = "";
 
     while (!quit) {
-        getline(cin, message, '\n');
+        if (!getline(cin, message, '\n')) {
+            cout << "Tiau" << endl;
+            message = "/quit";
+        }
 
         if (message == "/menu") {
             cout << get_menu();
@@ -81,18 +92,26 @@ bool check_username(string username) {
 string get_nickname() {
     string nickname = "";
     cout << "Type your nickname (a-z, A-Z, ., _, -): ";
-    getline(cin, nickname);
+    if(!getline(cin, nickname)) {
+        cout << "Quitting" << endl;
+        exit(0);
+    }
     
     while (!check_username(nickname)) {
         cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2): ";
-        getline(cin, nickname);
+        if(!getline(cin, nickname)) {
+           cout << "Quitting" << endl;
+           exit(0);
+        }
     }
 
     return nickname;
 }
 
+
 int main(int argc, char* argv[]) {
-    // signal(SIGINT, Sigint_handler); 
+    signal(SIGINT, Sigint_handler);
+    signal(EOF, eof_handler);
 
     pthread_t tid_receive;
     pthread_t tid_send;
@@ -101,7 +120,11 @@ int main(int argc, char* argv[]) {
     cout << get_menu();
 
     while (command != "/connect") {
-        getline(cin, command);
+        if(!getline(cin, command, '\n')) {
+            cout << "quitting" << endl;
+            exit(0);
+        }
+
         if (command == "/menu") cout << get_menu();
         else if(command == "/quit") exit(0);
     }
