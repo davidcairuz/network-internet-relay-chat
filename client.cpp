@@ -12,6 +12,10 @@ string nickname = "";
 bool quit = false;
 Socket* client_socket;
 
+string get_menu() {
+    return "-------- Options -------- \n /connect: Connects to server \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n";
+}
+
 void* client_receive_thread(void* arg) {
     string message = "";
 
@@ -33,6 +37,11 @@ void* client_send_thread(void* arg) {
 
     while (!quit) {
         getline(cin, message, '\n');
+
+        if (message == "/menu") {
+            cout << get_menu();
+            continue;
+        }
 
         for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
             client_socket->Write(message.substr(i, Socket::buffer_size));
@@ -62,6 +71,7 @@ int main(int argc, char* argv[]) {
     pthread_t tid;
     string command = "";
     nickname = get_nickname();
+    cout << get_menu();
 
     while (command != "/connect") getline(cin, command);
 
