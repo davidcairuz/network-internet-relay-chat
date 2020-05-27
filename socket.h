@@ -73,6 +73,9 @@ public:
     /*
      * Recebe mensagem de outro socket
      * 
+     * @params conn_fd: File descriptor do
+     *                  socket que vai enviar 
+     *                  a mensagem
      * @return mensagem recebida
      */
     string Read(int conn_fd);
@@ -81,8 +84,10 @@ public:
      * Envia uma mensagem para outro socket
      * 
      * @params msg: mensagem enviada
+     * @params: conn_fd: File descriptor onde
+     *                   vamos escrever a mensagem
      */
-    int Write(string msg, int conn_fd = -1, string id = "default");
+    int Write(string msg, int conn_fd = -1);
 
     int Get_conn_fd();
 

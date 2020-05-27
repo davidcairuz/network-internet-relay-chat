@@ -6,6 +6,7 @@ string nickname = "";
 bool quit = false;
 Socket* client_socket;
 
+// Lida com Control+C
 void Sigint_handler(int sig_num) {
     signal(SIGINT, Sigint_handler);
     cout << "\nCannot quit using crtl+c\n";
@@ -50,6 +51,7 @@ string get_nickname() {
     return nickname;
 }
 
+// Thread para receber mensagens do servidor
 void* client_receive_thread(void* arg) {
     string message = "";
 
@@ -77,6 +79,7 @@ void* client_receive_thread(void* arg) {
     pthread_exit(NULL);
 }
 
+// Thread para enviar mensagens para o servidor
 void* client_send_thread(void* arg) {
     cout << "Connected to server" << endl;
     client_socket->Write(nickname);

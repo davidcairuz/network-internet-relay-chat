@@ -121,7 +121,7 @@ string Socket::Read(int conn_fd) {
 	return ret;
 }
 
-int Socket::Write(string msg, int conn_fd, string id) {
+int Socket::Write(string msg, int conn_fd) {
 	if (log) cout << "Writing\n";
 
 	// Default conn_fd

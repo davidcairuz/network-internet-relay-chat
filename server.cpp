@@ -11,6 +11,8 @@ vector<int> clients;
 vector<pair <int, string>> ids;
 int curr_id = 0;
 
+// Inesere o file descriptor e
+// usuário do cliente em ids
 void insert_client(int new_client, string nickname) {
     pthread_mutex_lock(&lock);
     
@@ -21,6 +23,8 @@ void insert_client(int new_client, string nickname) {
     pthread_mutex_unlock(&lock);
 }
 
+// Remove o cliente de ids, 
+// Liberando espaço para novos usuários
 void remove_client(int client) {
     pthread_mutex_lock(&lock);
     
@@ -32,6 +36,8 @@ void remove_client(int client) {
     pthread_mutex_unlock(&lock);
 }
 
+// Manda mensagem para todos os clientes
+// Conectados
 void spread_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
     
@@ -54,6 +60,8 @@ void spread_message(string message, int speaker) {
     pthread_mutex_unlock(&lock);
 }
 
+// Manda mensagem para apenas o cliente com
+// Files descriptor speaker
 void send_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
     
@@ -66,6 +74,7 @@ void send_message(string message, int speaker) {
     pthread_mutex_unlock(&lock);
 }
 
+// Thread para iteragir com o cliente
 void* server_thread(void* arg) {
     int new_client = *((int*)arg);
 
