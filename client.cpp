@@ -141,7 +141,7 @@ int main(int argc, char* argv[]) {
         else if(command == "/quit") 
             exit(0);
         else if(command == "/ping") 
-            cout << "You've got to be connected!";
+            cout << "You've got to be connected!" << endl;
         else if(command.size() >= 9 && command.substr(0, 9) == "/nickname") {
             if (command.size () < 12) 
                 cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";

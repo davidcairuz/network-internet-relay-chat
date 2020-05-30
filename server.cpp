@@ -12,7 +12,7 @@ vector<pair <int, string>> ids;
 int curr_id = 0;
 
 // Inesere o file descriptor e
-// usuário do cliente em ids
+// nome de usuário do cliente em ids
 void insert_client(int new_client, string nickname) {
     pthread_mutex_lock(&lock);
     
@@ -41,8 +41,17 @@ void remove_client(int client) {
 void spread_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
     
-    auto pos = find(clients.begin(), clients.end(), speaker) - clients.begin();
-    string name = to_string(ids[pos].first) + "#" + ids[pos].second + ": ";
+    string name;
+    
+    // O speaker == -1 quando o server deseja falar com todos os usuários
+    if (speaker != -1) {
+        auto pos = find(clients.begin(), clients.end(), speaker) - clients.begin();
+        name = ids[pos].second + "#" + to_string(ids[pos].first) + ": ";
+
+    } else {
+        name = "Server: ";
+    }
+
     int max_len = Socket::buffer_size - name.size();
 
     for (int client : clients) {
@@ -61,7 +70,7 @@ void spread_message(string message, int speaker) {
 }
 
 // Manda mensagem para apenas o cliente com
-// Files descriptor speaker
+// File descriptor speaker
 void send_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
     
@@ -89,7 +98,7 @@ void* server_thread(void* arg) {
             remove_client(new_client);
 
         } else if (message == "/ping") {
-            send_message("pong", new_client);
+            spread_message("pong!", -1);
 
         } else if(message.size() >= 9 && message.substr(0, 9) == "/nickname") {
             string new_nickname = message.substr(10, message.size());

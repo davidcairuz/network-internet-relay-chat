@@ -19,13 +19,13 @@
 O Makefile tem os seguintes comandos:
 
 - make all: compila todos os arquivos, gerando executáveis para o cliente e para o servidor
-- make client: compila os arquivos relacionados ao cliente e o executa
-- make servidor: compila os arquivos relacionados ao servidor e o executa
+- make client: compila os arquivos relacionados ao cliente
+- make servidor: compila os arquivos relacionados ao servidor
 - make socket: compila os arquivos relacionados ao socket
 - make error: compila os arquivos relacionados ao error
 - make clean: remove os arquivos binários e executáveis da pasta
 
 Para utilizar o sistema deve-se executar os arquivos na seguinte ordem:
 
-- Primeiramente é preciso executar o servidor, para isso é possível utilizar o comando make server
-- Em seguida executa-se o cliente, para isso é possível utilizar o comando make client
+- Primeiramente é preciso executar o servidor, para isso é possível utilizar o comando ./server
+- Em seguida executa-se o cliente, para isso é possível utilizar o comando ./client
