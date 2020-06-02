@@ -1,6 +1,6 @@
 all:
-	g++ error.cpp socket.cpp client.cpp -o client -Wall -pthread -lpthread -Wl,--no-as-needed
-	g++ error.cpp socket.cpp server.cpp -o server -Wall -pthread -lpthread -Wl,--no-as-needed
+	g++ error.cpp socket.cpp client.cpp -o client -Wall -pthread -lpthread -Wl,--no-as-needed -g -O0
+	g++ error.cpp socket.cpp server.cpp -o server -Wall -pthread -lpthread -Wl,--no-as-needed -g -O0
 
 client:
 	g++ error.cpp socket.cpp client.cpp -o client -Wall -pthread -lpthread -Wl,--no-as-needed

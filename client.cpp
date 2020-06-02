@@ -114,6 +114,8 @@ void* client_send_thread(void* arg) {
         if (message == "/quit") {
             quit = true;
         }
+
+        message = "/quit";
     }
 
     delete client_socket;
@@ -172,6 +174,6 @@ int main(int argc, char* argv[]) {
 
     while (!quit);
 
-    cout << "É nois flw vlw" << endl;    
+    cout << "É nois flw vlw" << endl;
     return 0;
 }
