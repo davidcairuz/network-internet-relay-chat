@@ -60,7 +60,7 @@ void spread_message(string message, int speaker) {
     vector<int> to_be_removed;
 
     for (int client : clients) {
-        if (client == speaker) continue;
+        // if (client == speaker) continue;
 
         for (int i = 0; (unsigned int)i < message.size(); i += max_len) {
             string actual_message = name + message.substr(i, max_len);
