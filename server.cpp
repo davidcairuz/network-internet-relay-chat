@@ -33,12 +33,11 @@ void remove_client(int client) {
     pthread_mutex_lock(&lock);
     
     auto pos = find(clients.begin(), clients.end(), client) - clients.begin();
-    cout << pos << endl;
     ids.erase(ids.begin() + pos);
     clients.erase(clients.begin() + pos);
     active_clients--;
 
-    cout << clients.size() << " " << ids.size() << " Active clients: \n";
+    cout << " Active clients: \n";
     for (int i = 0; i < (int)ids.size(); i++) {
         cout << '\t' << ids[i].first << " " << ids[i].second << " " << clients[i] << endl;
     }
@@ -121,7 +120,7 @@ void* server_thread(void* arg) {
         }        
     }
 
-    cout << "Exit socket_thread" << endl;
+    cout << "A user has left us :(" << endl;
     pthread_exit(NULL);
 }
 
