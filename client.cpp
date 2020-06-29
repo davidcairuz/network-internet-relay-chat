@@ -118,7 +118,6 @@ void* client_send_thread(void* arg) {
         message = "/quit";
     }
 
-    delete client_socket;
     pthread_exit(NULL);
 }
 
