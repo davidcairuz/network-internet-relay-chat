@@ -88,7 +88,6 @@ void send_message(string message, int speaker) {
     // pthread_mutex_lock(&lock);
 
     int status = -1, retries = Socket::max_retries;
-    cout << "Send message begin\n";
     for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
         cout << speaker << " speaking\n";
         while (status == -1 && retries--)
@@ -96,7 +95,6 @@ void send_message(string message, int speaker) {
     }
     
     if (status == -1) active->remove(speaker);
-    cout << "Send message end\n";
     
     pthread_mutex_unlock(&lock);
 }
@@ -110,13 +108,9 @@ void spread_message(string message, int speaker) {
     
     int pos = active->find(speaker);
     name = active->clients[pos].name + "#" + to_string(active->clients[pos].id) + ": ";
-    cout << "I'm here!\n";
-    cout << "Channel name " << active->clients[pos].channel_name << endl;
     
     if (active->clients[pos].channel_name == "$") {
-        cout << "Entrei no if rsrs" << endl;
         send_message("Please, join a channel", speaker);
-        cout << "Saindo do if rsrs" << endl;
         pthread_mutex_unlock(&lock);
         return;
     }
@@ -177,7 +171,7 @@ void* server_thread(void* arg) {
         } else if (message.size() >= 5 && message.substr(0, 5) == "/join") {
             string channel_name = message.substr(6, message.size());
             int pos = active->find(new_client);
-            bool is_admin = channels.find(channel_name) != channels.end();
+            bool is_admin = channels.find(channel_name) == channels.end();
             
             active->clients[pos].channel_name = channel_name;
             active->clients[pos].is_admin = is_admin;
@@ -252,9 +246,9 @@ void* server_thread(void* arg) {
                 continue;
             } 
             
-            string to_be_found = message.substr(8, message.size());
+            string to_be_found = message.substr(7, message.size());
             int pos = active->find(active->clients[pos_client].channel_name, to_be_found);
-
+            
             if (pos == -1 or active->clients[pos].channel_name != active->clients[pos_client].channel_name) {
                 send_message("This user is not here", new_client);
                 continue;
