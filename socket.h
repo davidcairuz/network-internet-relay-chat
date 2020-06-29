@@ -109,6 +109,8 @@ public:
      * Checa se há um erro e, caso haja, encerra o programa 
      */
     void Check();
+
+    string Get_ip();
 };
 
 #endif

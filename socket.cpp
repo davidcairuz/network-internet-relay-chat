@@ -164,3 +164,7 @@ string Socket::Get_error(){
 bool Socket::Has_error() {
 	return this->error.has_occurred();
 }
+
+string Socket::Get_ip() {
+	return this->ip;
+}

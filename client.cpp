@@ -3,6 +3,7 @@
 #include <pthread.h>
 
 string nickname = "";
+string channel = "";
 bool quit = false;
 Socket* client_socket;
 
@@ -11,6 +12,15 @@ void Sigint_handler(int sig_num) {
     signal(SIGINT, Sigint_handler);
     cout << "\nCannot quit using crtl+c\n";
     fflush(stdout);
+}
+
+bool check_channel_name(string name){
+    if(name.size() == 0 or name.size() > 200) return false;
+    if(name[0] != '#' and name[0] != '&') return false;
+    if(name.find(' ') != name.npos) return false;
+    if(name.find(',') != name.npos) return false;
+    if(name.find((char)7) != name.npos) return false;
+    return true;
 }
 
 string get_menu() {
@@ -75,7 +85,6 @@ void* client_receive_thread(void* arg) {
         } while (message.size() == Socket::buffer_size && !quit);
     }
 
-    delete client_socket;
     pthread_exit(NULL);
 }
 
@@ -83,6 +92,7 @@ void* client_receive_thread(void* arg) {
 void* client_send_thread(void* arg) {
     cout << "Connected to server" << endl;
     client_socket->Write(nickname);
+    client_socket->Write(client_socket->Get_ip());
     string message = "";
 
     while (!quit) {
@@ -94,6 +104,7 @@ void* client_send_thread(void* arg) {
         if (message == "/menu") {
             cout << get_menu();
             continue;
+            
         } else if(message.size() >= 9 && message.substr(0, 9) == "/nickname") {
             if (message.size () < 12) 
                 cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";
@@ -103,6 +114,16 @@ void* client_send_thread(void* arg) {
             if (check_username(nickname)) {
                 nickname = new_nickname;
                 cout << "Nickname updated to: " << nickname << endl;        
+            }
+
+        } else if(message.size() >= 5 && message.substr(0, 5) == "/join") {
+            string new_channel = message.substr(6, message.size());
+            
+            if (check_channel_name(new_channel)) {
+                channel = new_channel;
+                cout << "Joined channel " << channel << endl;        
+            } else {
+                continue;
             }
         }
 
@@ -128,7 +149,7 @@ int main(int argc, char* argv[]) {
     pthread_t tid_send;
     string command = "";
     
-    nickname = get_nickname();    
+    nickname = get_nickname();
     cout << get_menu();
 
     while (command != "/connect") {
@@ -144,14 +165,22 @@ int main(int argc, char* argv[]) {
         else if(command == "/ping") 
             cout << "You've got to be connected!" << endl;
         else if(command.size() >= 9 && command.substr(0, 9) == "/nickname") {
-            if (command.size () < 12) 
-                cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";
-            
             string new_nickname = command.substr(10, command.size());
+            
             if (check_username(nickname)) {
                 nickname = new_nickname;
                 cout << "Nickname updated to: " << nickname << endl;        
-            }
+            } else {
+                cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";
+            }    
+        } else if(command.size() >= 5 && command.substr(0, 5) == "/join") {
+            cout << "You've got to be connected!" << endl;
+        } else if (command.size() >= 5 && command.substr(0, 5) == "/kick") {
+            cout << "You've got to be connected!" << endl;
+        } else if (command.size() >= 5 && command.substr(0, 5) == "/mute") {
+            cout << "You've got to be connected!" << endl;
+        } else if (command.size() >= 7 && command.substr(0, 7) == "/unmute") {
+            cout << "You've got to be connected!" << endl;
         }
     }
 
