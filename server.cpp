@@ -85,8 +85,6 @@ ActiveClients* active = new ActiveClients();
 // Manda mensagem para apenas o cliente com
 // File descriptor speaker
 void send_message(string message, int speaker) {
-    // pthread_mutex_lock(&lock);
-
     int status = -1, retries = Socket::max_retries;
     for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
         cout << speaker << " speaking\n";
@@ -184,7 +182,7 @@ void* server_thread(void* arg) {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
-                send_message("You can't be that bad!!", new_client);
+                send_message("You can't be that bad!", new_client);
                 continue;
             }
             string to_be_kicked = message.substr(6, message.size());
@@ -205,7 +203,7 @@ void* server_thread(void* arg) {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
-                send_message("You can't be that bad!!", new_client);
+                send_message("The Force is not with you!!", new_client);
                 continue;
             } 
             string to_be_kicked = message.substr(6, message.size());
@@ -223,7 +221,7 @@ void* server_thread(void* arg) {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
-                send_message("You can't be that bad!!", new_client);
+                send_message("The Force is not with you!!", new_client);
                 continue;
             } 
             string to_be_kicked = message.substr(8, message.size());
@@ -242,7 +240,7 @@ void* server_thread(void* arg) {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
-                send_message("You can't be that bad!!", new_client);
+                send_message("The Force is not with you!!", new_client);
                 continue;
             } 
             
