@@ -11,8 +11,8 @@
 #include <string.h>
 #include "error.h"
 
-#define LOCALHOST "159.89.214.31"
-#define DEFAULT_PORT 80
+#define LOCALHOST "127.0.0.1"
+#define DEFAULT_PORT 8080
 #define log 0
 
 using namespace std;
@@ -24,12 +24,12 @@ private:
     string ip;
     string name;
     Error error;
-    int sock_fd;
     int conn_fd;
     bool connected;
     struct sockaddr_in serv_addr, client_addr;
 
 public:
+    int sock_fd;
     static const int buffer_size = 4096;
     static const int max_size = 65536;
     static const int max_clients = 64;
