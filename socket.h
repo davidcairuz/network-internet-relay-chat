@@ -11,7 +11,7 @@
 #include <string.h>
 #include "error.h"
 
-#define LOCALHOST "127.0.0.1"
+#define LOCALHOST "159.89.214.31"
 #define DEFAULT_PORT 8080
 #define log 0
 
