@@ -161,12 +161,12 @@ void* server_thread(void* arg) {
         } else if (message == "/ping") {
             send_message("pong!", new_client);
 
-        } else if(message.size() >= 9 && message.substr(0, 9) == "/nickname") {
+        } else if(message.size() >= 10 && message.substr(0, 9) == "/nickname") {
             string new_nickname = message.substr(10, message.size());
             int pos = active->find(new_client);
             active->clients[pos].name = new_nickname;
         
-        } else if (message.size() >= 5 && message.substr(0, 5) == "/join") {
+        } else if (message.size() >= 6 && message.substr(0, 5) == "/join") {
             string channel_name = message.substr(6, message.size());
             int pos = active->find(new_client);
             bool is_admin = channels.find(channel_name) == channels.end();
@@ -176,9 +176,10 @@ void* server_thread(void* arg) {
             
             if(is_admin)
                 channels[channel_name] = 0;
+            
             channels[channel_name]++;
 
-        } else if (message.size() >= 5 && message.substr(0, 5) == "/kick") {
+        } else if (message.size() >= 6 && message.substr(0, 5) == "/kick") {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
@@ -199,7 +200,7 @@ void* server_thread(void* arg) {
             channels[active->clients[pos_client].channel_name]--;
             
 
-        } else if (message.size() >= 5 && message.substr(0, 5) == "/mute") {
+        } else if (message.size() >= 6 && message.substr(0, 5) == "/mute") {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
@@ -217,7 +218,7 @@ void* server_thread(void* arg) {
             send_message("Admin can't stand you anymore", active->clients[pos].conn);
             active->clients[pos].is_muted = true;
             
-        } else if (message.size() >= 7 && message.substr(0, 7) == "/unmute") {
+        } else if (message.size() >= 8 && message.substr(0, 7) == "/unmute") {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
@@ -236,7 +237,7 @@ void* server_thread(void* arg) {
             active->clients[pos].is_muted = false;
             
                
-        } else if (message.size() >= 6 && message.substr(0, 6) == "/whois") {
+        } else if (message.size() >= 7 && message.substr(0, 6) == "/whois") {
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
@@ -285,7 +286,6 @@ int main(int argc, char* argv[]) {
 
         string nickname = socket_server->Read(new_client);
         string ip = socket_server->Read(new_client);
-        // string ip = "haha";
 
         cout << "New client: " << nickname << endl;
         active->insert(new_client, nickname, ip);

@@ -33,7 +33,8 @@ void Socket::Bind(){
 
 	/* Manda o socket ouvir em todas as interfaces disponíveis */
 	this->serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
-	
+	this->ip = string(inet_ntoa(this->serv_addr.sin_addr));
+
 	/* Port em network byte order */
 	this->serv_addr.sin_port = htons(this->port);
 
