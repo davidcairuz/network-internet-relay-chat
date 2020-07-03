@@ -22,7 +22,7 @@ Socket::Socket(string ip, string name, int port) {
 
 Socket::~Socket() {
 	Disconnect();
-	if (log) cout << "Deleting socket(\n";
+	if (log) cout << "Deleting socket\n";
 }
 
 void Socket::Bind(){
@@ -76,13 +76,14 @@ void Socket::Connect() {
 }
 
 int Socket::Accept() {
-	if (log) cout << "Accepting\n";
+	if (1) cout << "Accepting\n";
 	
 	sockaddr_in received_addr;
 	socklen_t addr_size = sizeof(received_addr);
 
 	int connection_fd = accept(this->sock_fd, (struct sockaddr *)&received_addr, &addr_size);
 
+	cout << connection_fd << "  accept\n";
 	if (connection_fd == -1) {
 		this->error.set_occurred();
 		this->error.set_message("Server didn't accept, sorry =(\n");

@@ -195,13 +195,12 @@ int main(int argc, char* argv[]) {
         cout << "Failed to create thread to send message" << endl;
         return 1;
     }
-
     if (pthread_create(&tid_receive, NULL, client_receive_thread, NULL) != 0) {
         cout << "Failed to create thread to receive message" << endl;
         return 1;
     }
 
-    while (!quit);
+    while (!quit); //Checa aqui sem problemas
 
     cout << "É nois flw vlw" << endl;
     return 0;

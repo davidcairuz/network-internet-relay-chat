@@ -4,7 +4,7 @@
 #include <pthread.h>
 #include <map>
 
-Socket* socket_server = new Socket("0.0.0.0");
+Socket* socket_server = new Socket("0.0.0.0", "server", 8192);
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 map<string, int> channels;
 
@@ -276,7 +276,9 @@ int main(int argc, char* argv[]) {
     pthread_t tid;
 
     while (1) {
+        cout << "while\n";
         int new_client = socket_server->Accept();
+        cout << "accepted\n";
         socket_server->Check();
         
         if (active->clients.size() == Socket::max_clients) {
