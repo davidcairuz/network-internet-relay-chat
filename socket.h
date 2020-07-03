@@ -12,7 +12,7 @@
 #include "error.h"
 
 #define LOCALHOST "159.89.214.31"
-#define DEFAULT_PORT 8080
+#define DEFAULT_PORT 80
 #define log 0
 
 using namespace std;

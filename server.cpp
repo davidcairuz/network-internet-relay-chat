@@ -271,11 +271,13 @@ int main(int argc, char* argv[]) {
     cout << "Chat Initialized =D\n";
 
     socket_server->Listen();
+    cout << "Listened\n";
     socket_server->Check();
 
     pthread_t tid;
 
     while (1) {
+        cout << "while\n";
         int new_client = socket_server->Accept();
         socket_server->Check();
         
