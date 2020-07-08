@@ -105,7 +105,7 @@ void* client_send_thread(void* arg) {
             cout << get_menu();
             continue;
             
-        } else if(message.size() >= 9 && message.substr(0, 9) == "/nickname") {
+        } else if(message.size() >= 10 && message.substr(0, 9) == "/nickname") {
             if (message.size () < 12) 
                 cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2)";
             
@@ -116,12 +116,12 @@ void* client_send_thread(void* arg) {
                 cout << "Nickname updated to: " << nickname << endl;        
             }
 
-        } else if(message.size() >= 5 && message.substr(0, 5) == "/join") {
+        } else if(message.size() >= 6 && message.substr(0, 5) == "/join") {
             string new_channel = message.substr(6, message.size());
             
             if (check_channel_name(new_channel)) {
                 channel = new_channel;
-                cout << "Joined channel " << channel << endl;        
+                cout << "Joined channel " << channel << endl;
             } else {
                 cout << "Invalid channel " << channel << endl;
                 continue;
