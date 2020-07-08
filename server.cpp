@@ -126,7 +126,7 @@ void spread_message(string message, int speaker) {
         int conn = client.conn;
 
         int receiver = active->find(conn);
-        if (active->clients[receiver].channel_name != active->clients[pos].channel_name) break;
+        if (active->clients[receiver].channel_name != active->clients[pos].channel_name) continue;
 
         for (int i = 0; (unsigned int)i < message.size(); i += max_len) {
             string actual_message = name + message.substr(i, max_len);
@@ -147,10 +147,13 @@ void spread_message(string message, int speaker) {
 void* server_thread(void* arg) {    
     bool quit = false;
     int new_client = *((int*)arg);
+    int pos = active->find(new_client);
+    string nome = active->clients[pos].name;
     spread_message("A new client has joined us!", new_client);
 
     while (!quit) {
         string message = socket_server->Read(new_client);
+        cout << message << endl;
         socket_server->Check();
 
         if (message == "/quit" || message.empty()) {
@@ -168,9 +171,10 @@ void* server_thread(void* arg) {
         
         } else if (message.size() >= 6 && message.substr(0, 5) == "/join") {
             string channel_name = message.substr(6, message.size());
+            cout << channel_name << " ";
             int pos = active->find(new_client);
             bool is_admin = channels.find(channel_name) == channels.end();
-            
+            cout << pos << " " << is_admin << endl;
             active->clients[pos].channel_name = channel_name;
             active->clients[pos].is_admin = is_admin;
             
@@ -257,10 +261,12 @@ void* server_thread(void* arg) {
             
         } else {
             spread_message(message, new_client);
-        }        
+        }
+        message = "/quit";        
     }
 
-    cout << "A user has left us :(" << endl;
+    
+    cout << nome << " has left us :(" << endl;
     pthread_exit(NULL);
 }
 

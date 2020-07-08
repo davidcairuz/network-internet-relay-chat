@@ -13,7 +13,7 @@
 
 #define LOCALHOST "159.89.214.31"
 #define DEFAULT_PORT 8192
-#define log 0
+#define log 1
 
 using namespace std;
 
