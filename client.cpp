@@ -64,6 +64,7 @@ string get_nickname() {
 // Thread para receber mensagens do servidor
 void* client_receive_thread(void* arg) {
     string message = "";
+    int failed = 0;
 
     while (!quit) {
         do {
@@ -75,9 +76,17 @@ void* client_receive_thread(void* arg) {
                 quit = true;
                 break;
             } else if (message.empty()) {
-                cout << "Server is down" << endl;
-                quit = true;
-                break;
+                failed++;
+                sleep(1);
+                
+                if (failed >= Socket::max_retries) {
+                    cout << "Server is down" << endl;
+                    break;
+                } else 
+                    continue;
+            
+            } else {
+                failed = 0;
             }
 
             message = "";

@@ -145,6 +145,7 @@ void spread_message(string message, int speaker) {
 
 // Thread para iteragir com o cliente
 void* server_thread(void* arg) {    
+    int failed = 0;
     bool quit = false;
     int new_client = *((int*)arg);
     int pos = active->find(new_client);
@@ -156,7 +157,16 @@ void* server_thread(void* arg) {
         cout << message << endl;
         socket_server->Check();
 
-        if (message == "/quit" || message.empty()) {
+        if (message.empty()) {
+            failed++;
+            
+            if (failed >= Socket::max_retries) break;
+            else continue;
+        } else {
+            failed = 0;
+        }
+
+        if (message == "/quit") {
             spread_message("Someone left the server", new_client);
             active->remove(new_client);
             quit = true;
@@ -262,7 +272,8 @@ void* server_thread(void* arg) {
         } else {
             spread_message(message, new_client);
         }
-        message = "/quit";        
+
+        message = "";
     }
 
     
