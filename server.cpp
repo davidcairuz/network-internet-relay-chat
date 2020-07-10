@@ -307,12 +307,8 @@ void* server_thread(void* arg) {
                 continue;
             }
 
-            send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join" + active->clients[pos_client].channel_name, active->clients[pos].conn);
+            send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join " + active->clients[pos_client].channel_name, active->clients[pos].conn);
             channels_permissions[active->clients[pos_client].channel_name].push_back(active->clients[pos].conn);
-            // for(auto v: channels_permissions[active->clients[pos_client].channel_name])
-            //     cout << v << " ";
-            // cout << 
-            
         } else {
             spread_message(message, new_client);
         }
@@ -320,7 +316,6 @@ void* server_thread(void* arg) {
         message = "";
     }
 
-    
     cout << nome << " has left us :(" << endl;
     pthread_exit(NULL);
 }

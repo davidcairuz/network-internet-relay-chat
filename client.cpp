@@ -24,7 +24,7 @@ bool check_channel_name(string name){
 }
 
 string get_menu() {
-    return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n  /mute: Mutes a client\n /unmute: Unmutes a client\n\n";
+    return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n /mute: Mutes a client\n /unmute: Unmutes a client\n /invite: Invites a client to your channel\n";
 }
 
 bool check_letter(char letter) {
@@ -154,6 +154,14 @@ void* client_send_thread(void* arg) {
 int main(int argc, char* argv[]) {
     signal(SIGINT, Sigint_handler);
 
+    if (argc == 0) {
+        cout << "Provide your ip, dubass\n";
+        return 1; 
+    }
+
+    // checar ip
+    string ip = argv[0];
+
     pthread_t tid_receive;
     pthread_t tid_send;
     string command = "";
@@ -193,7 +201,7 @@ int main(int argc, char* argv[]) {
         }
     }
 
-    client_socket = new Socket(LOCALHOST, nickname);
+    client_socket = new Socket(ip, nickname);
     client_socket->Check();
 
     client_socket->Connect();
