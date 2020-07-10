@@ -154,13 +154,13 @@ void* client_send_thread(void* arg) {
 int main(int argc, char* argv[]) {
     signal(SIGINT, Sigint_handler);
 
-    if (argc == 0) {
-        cout << "Provide your ip, dubass\n";
+    if (argc < 1) {
+        cout << "Provide your ip, dumbass\n";
         return 1; 
     }
 
     // checar ip
-    string ip = argv[0];
+    string ip = argv[1];
 
     pthread_t tid_receive;
     pthread_t tid_send;

@@ -308,6 +308,7 @@ void* server_thread(void* arg) {
             }
 
             send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join " + active->clients[pos_client].channel_name, active->clients[pos].conn);
+            send_message("Invite sent!", new_client);
             channels_permissions[active->clients[pos_client].channel_name].push_back(active->clients[pos].conn);
         } else {
             spread_message(message, new_client);
@@ -332,9 +333,7 @@ int main(int argc, char* argv[]) {
     pthread_t tid;
 
     while (1) {
-        cout << "while\n";
         int new_client = socket_server->Accept();
-        cout << "accepted\n";
         socket_server->Check();
         
         if (active->clients.size() == Socket::max_clients) {

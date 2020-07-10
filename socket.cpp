@@ -167,5 +167,5 @@ bool Socket::Has_error() {
 }
 
 string Socket::Get_ip() {
-	return this->ip;
+	return inet_ntoa(this->serv_addr.sin_addr);
 }
