@@ -46,7 +46,7 @@ public:
         clients.push_back(new_client);
     
         cout << "Active clients: \n";
-        for (int i = 0; i < clients.size(); i++) {
+        for (unsigned int i = 0; i < clients.size(); i++) {
             cout << '\t' << clients[i].id << endl;
         }
 
@@ -54,19 +54,19 @@ public:
     }
 
     int find(int conn){
-        for(int pos = 0; pos < (int)clients.size(); pos++) 
+        for (unsigned int pos = 0; pos < clients.size(); pos++) 
             if(clients[pos].conn == conn) return pos;
         return -1;
     }
 
     int find(string name){
-        for(int pos = 0; pos < (int)clients.size(); pos++) 
+        for (unsigned int pos = 0; pos < clients.size(); pos++) 
             if(clients[pos].name == name) return pos;
         return -1;
     }
 
     int find(string channel, string name){
-        for(int pos = 0; pos < (int)clients.size(); pos++) 
+        for(unsigned int pos = 0; pos < clients.size(); pos++) 
             if(clients[pos].name == name && clients[pos].channel_name == channel) return pos;
         return -1;
     }
@@ -79,7 +79,7 @@ public:
         clients.erase(clients.begin() + pos);
 
         cout << " Active clients: \n";
-        for (int i = 0; i < clients.size(); i++) {
+        for (unsigned int i = 0; i < clients.size(); i++) {
             cout << '\t' << clients[i].id << endl;
         }
 
@@ -307,8 +307,11 @@ void* server_thread(void* arg) {
                 continue;
             }
 
-            send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join" + active->clients[pos_client].channel_name, new_client);
-            channels_permissions[active->clients[pos_client].channel_name].push_back(active->clients[pos].id);
+            send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join" + active->clients[pos_client].channel_name, active->clients[pos].conn);
+            channels_permissions[active->clients[pos_client].channel_name].push_back(active->clients[pos].conn);
+            // for(auto v: channels_permissions[active->clients[pos_client].channel_name])
+            //     cout << v << " ";
+            // cout << 
             
         } else {
             spread_message(message, new_client);
