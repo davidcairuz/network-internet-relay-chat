@@ -24,7 +24,7 @@ bool check_channel_name(string name){
 }
 
 string get_menu() {
-    return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n /mute: Mutes a client\n /unmute: Unmutes a client\n /invite: Invites a client to your channel\n";
+    return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n /mute: Mutes a client\n /unmute: Unmutes a client\n /invite: Invites a client to your channel\n\n";
 }
 
 bool check_letter(char letter) {
@@ -154,7 +154,7 @@ void* client_send_thread(void* arg) {
 int main(int argc, char* argv[]) {
     signal(SIGINT, Sigint_handler);
 
-    if (argc < 1) {
+    if (argc < 2) {
         cout << "Provide your ip, dumbass\n";
         return 1; 
     }
