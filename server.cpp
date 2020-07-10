@@ -7,6 +7,7 @@
 Socket* socket_server = new Socket("0.0.0.0", "server", 8192);
 pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 map<string, int> channels;
+map<string, vector<int>> channels_permissions;
 
 class Client {
 public:
@@ -55,6 +56,12 @@ public:
     int find(int conn){
         for(int pos = 0; pos < (int)clients.size(); pos++) 
             if(clients[pos].conn == conn) return pos;
+        return -1;
+    }
+
+    int find(string name){
+        for(int pos = 0; pos < (int)clients.size(); pos++) 
+            if(clients[pos].name == name) return pos;
         return -1;
     }
 
@@ -160,7 +167,7 @@ void* server_thread(void* arg) {
         if (message.empty()) {
             failed++;
             
-            if (failed >= Socket::max_retries) break;
+            if (failed >= Socket::max_retries) message = "/quit";
             else continue;
         } else {
             failed = 0;
@@ -181,15 +188,30 @@ void* server_thread(void* arg) {
         
         } else if (message.size() >= 6 && message.substr(0, 5) == "/join") {
             string channel_name = message.substr(6, message.size());
-            cout << channel_name << " ";
-            int pos = active->find(new_client);
-            bool is_admin = channels.find(channel_name) == channels.end();
-            cout << pos << " " << is_admin << endl;
-            active->clients[pos].channel_name = channel_name;
-            active->clients[pos].is_admin = is_admin;
             
-            if(is_admin)
-                channels[channel_name] = 0;
+            int pos = active->find(new_client);
+            bool is_admin = (channels[channel_name] == 0);
+            
+            if(channel_name[0] == '&' and !is_admin){
+                auto permissions = channels_permissions[channel_name];
+                auto can_join = find(permissions.begin(), permissions.end(), new_client) != permissions.end();
+                if (!can_join) {
+                    send_message("You're not welcome here >:(", new_client);
+                    continue;
+                }
+            }
+
+            active->clients[pos].channel_name = channel_name;
+            active->clients[pos].is_admin = is_admin;    
+            
+            send_message("Joined channel " + channel_name, new_client);
+
+            if(is_admin) {
+                channels[channel_name] = 1;
+                channels_permissions[channel_name] = {};
+                channels_permissions[channel_name].push_back(new_client);
+                send_message("You own this ****!", new_client);
+            }
             
             channels[channel_name]++;
 
@@ -268,6 +290,25 @@ void* server_thread(void* arg) {
             }
 
             send_message(active->clients[pos].name + " is " + active->clients[pos].ip, new_client);
+            
+        } else if (message.size() >= 8 && message.substr(0, 7) == "/invite") {
+            int pos_client = active->find(new_client);
+            
+            if (active->clients[pos_client].is_admin == false) {
+                send_message("The Force is not with you!!", new_client);
+                continue;
+            } 
+            
+            string to_be_found = message.substr(8, message.size());
+            int pos = active->find(to_be_found);
+            
+            if (pos == -1) {
+                send_message("This user doesn't exist", new_client);
+                continue;
+            }
+
+            send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join" + active->clients[pos_client].channel_name, new_client);
+            channels_permissions[active->clients[pos_client].channel_name].push_back(active->clients[pos].id);
             
         } else {
             spread_message(message, new_client);

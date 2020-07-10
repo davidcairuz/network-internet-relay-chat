@@ -24,7 +24,7 @@ bool check_channel_name(string name){
 }
 
 string get_menu() {
-    return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n\n";
+    return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n  /mute: Mutes a client\n /unmute: Unmutes a client\n\n";
 }
 
 bool check_letter(char letter) {
@@ -130,7 +130,6 @@ void* client_send_thread(void* arg) {
             
             if (check_channel_name(new_channel)) {
                 channel = new_channel;
-                cout << "Joined channel " << channel << endl;
             } else {
                 cout << "Invalid channel " << channel << endl;
                 continue;
