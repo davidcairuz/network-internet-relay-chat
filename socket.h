@@ -63,7 +63,7 @@ public:
     /*
      * Wrapper da função "accept" de C
      */
-    int Accept();
+    pair<int, string> Accept();
     
     /*
      * Wrapper da função "disconnect" de C

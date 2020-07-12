@@ -101,7 +101,6 @@ void* client_receive_thread(void* arg) {
 void* client_send_thread(void* arg) {
     cout << "Connected to server" << endl;
     client_socket->Write(nickname);
-    client_socket->Write(client_socket->Get_ip());
     string message = "";
 
     while (!quit) {

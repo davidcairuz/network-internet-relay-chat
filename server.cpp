@@ -333,7 +333,9 @@ int main(int argc, char* argv[]) {
     pthread_t tid;
 
     while (1) {
-        int new_client = socket_server->Accept();
+        string ip;
+        int new_client;
+        tie(new_client, ip) = socket_server->Accept();
         socket_server->Check();
         
         if (active->clients.size() == Socket::max_clients) {
@@ -342,8 +344,7 @@ int main(int argc, char* argv[]) {
         } 
 
         string nickname = socket_server->Read(new_client);
-        string ip = socket_server->Read(new_client);
-
+        
         cout << "New client: " << nickname << endl;
         active->insert(new_client, nickname, ip);
         cout << "Done" << endl;

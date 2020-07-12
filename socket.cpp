@@ -63,7 +63,7 @@ void Socket::Connect() {
 	
 	/* Port em network byte order */
 	this->serv_addr.sin_port = htons(this->port);
-
+    
 	int status = connect(this->sock_fd, (struct sockaddr*)&serv_addr, sizeof(serv_addr));
 
 	if (status == -1) {
@@ -75,7 +75,7 @@ void Socket::Connect() {
     this->connected = true;
 }
 
-int Socket::Accept() {
+pair<int, string> Socket::Accept() {
 	if (1) cout << "Accepting\n";
 	
 	sockaddr_in received_addr;
@@ -84,14 +84,16 @@ int Socket::Accept() {
 	int connection_fd = accept(this->sock_fd, (struct sockaddr *)&received_addr, &addr_size);
 
 	cout << connection_fd << "  accept\n";
+
 	if (connection_fd == -1) {
 		this->error.set_occurred();
 		this->error.set_message("Server didn't accept, sorry =(\n");
-		return -1;
+		return pair<int, string>(-1, "");
 	}
 	
 	this->conn_fd = connection_fd;
-	return connection_fd;
+	getpeername(connection_fd, (struct sockaddr*)&received_addr, &addr_size);
+	return pair<int, string>(connection_fd, inet_ntoa(received_addr.sin_addr));
 }
 
 void Socket::Disconnect() {
@@ -167,15 +169,5 @@ bool Socket::Has_error() {
 }
 
 string Socket::Get_ip() {
-	char hostbuffer[256]; 
-    char *IPbuffer; 
-    struct hostent *host_entry; 
-    int hostname; 
-  
-    hostname = gethostname(hostbuffer, sizeof(hostbuffer)); 
-    host_entry = gethostbyname(hostbuffer); 
-    IPbuffer = inet_ntoa(*((struct in_addr*) 
-                           host_entry->h_addr_list[0])); 
-
-	return string(IPbuffer);
+	return string(inet_ntoa(this->client_addr.sin_addr));
 }
