@@ -28,4 +28,4 @@ O Makefile tem os seguintes comandos:
 Para utilizar o sistema deve-se executar os arquivos na seguinte ordem:
 
 - Primeiramente é preciso executar o servidor, para isso é possível utilizar o comando ./server
-- Em seguida executa-se o cliente, para isso é possível utilizar o comando ./client
+- Em seguida executa-se o cliente. Deve ser fornecido o endereço de IP do servidor ao qual se deseja conectar. Para isso é possível utilizar o comando ./client ip_address
