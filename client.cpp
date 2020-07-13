@@ -14,6 +14,7 @@ void Sigint_handler(int sig_num) {
     fflush(stdout);
 }
 
+// checa se nome do canal está correto segundo as regras do RFC
 bool check_channel_name(string name){
     if(name.size() == 0 or name.size() > 200) return false;
     if(name[0] != '#' and name[0] != '&') return false;
@@ -23,14 +24,17 @@ bool check_channel_name(string name){
     return true;
 }
 
+// retorna uma string com o menu
 string get_menu() {
     return "-------- Options -------- \n /connect: Connects to server \n /join: Joins a channel \n /quit: Quits the connection \n /ping: Pings server\n /menu: Displays menu\n /nickname new_nickname: Changes nickname to the new_nickname\n /kick: Kicks a client if\n /mute: Mutes a client\n /unmute: Unmutes a client\n /invite: Invites a client to your channel\n\n";
 }
 
+// checa se caracter é válido
 bool check_letter(char letter) {
     return (letter >= 'a' && letter <= 'z') || (letter >= 'A' && letter <= 'Z') || (letter  == '.') || (letter == '_') || letter == '-';
 }
 
+// checa se nome do usuário é válido
 bool check_username(string username) {
     if (username.size() <= 2) return false;
     if (username == "server") return false;
@@ -41,6 +45,7 @@ bool check_username(string username) {
     return true;
 }
 
+// recebe o nome do usuário
 string get_nickname() {
     string nickname = "";
     cout << "Type your nickname (a-z, A-Z, ., _, -, size > 2): ";
@@ -61,6 +66,13 @@ string get_nickname() {
     return nickname;
 }
 
+// Checa se o ip inserido é válido
+bool check_ip(string ip) {
+    struct sockaddr_in sa;
+    int result = inet_pton(AF_INET, ip.c_str(), &(sa.sin_addr));
+    return (result != 0);
+}
+
 // Thread para receber mensagens do servidor
 void* client_receive_thread(void* arg) {
     string message = "";
@@ -72,10 +84,10 @@ void* client_receive_thread(void* arg) {
             client_socket->Check();
             cout << message << "\n";
             
-            if (message == "Too many people here, you are not welcome\n") {
+            if (message == "Too many people here, you are not welcome\n") { // server cheio
                 quit = true;
                 break;
-            } else if (message.empty()) {
+            } else if (message.empty()) { // checa se houve max_retries erros
                 failed++;
                 sleep(1);
                 
@@ -154,12 +166,15 @@ int main(int argc, char* argv[]) {
     signal(SIGINT, Sigint_handler);
 
     if (argc < 2) {
-        cout << "Provide your ip, dumbass\n";
+        cout << "Provide your ip, please\n";
         return 1; 
     }
 
-    // checar ip
     string ip = argv[1];
+    if (!check_ip(ip)) {
+        cout << "Invalid IP\n";
+        return 1;
+    }
 
     pthread_t tid_receive;
     pthread_t tid_send;
@@ -215,7 +230,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    while (!quit); //Checa aqui sem problemas
+    while (!quit); // Checa aqui sem problemas
 
     cout << "É nois flw vlw" << endl;
     return 0;

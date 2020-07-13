@@ -11,7 +11,6 @@
 #include <string.h>
 #include "error.h"
 
-#define LOCALHOST "159.89.214.31"
 #define DEFAULT_PORT 8192
 #define log 0
 
@@ -62,6 +61,8 @@ public:
     
     /*
      * Wrapper da função "accept" de C
+     * 
+     * @return par com conn_id e ip do socket
      */
     pair<int, string> Accept();
     
@@ -89,8 +90,15 @@ public:
      */
     int Write(string msg, int conn_fd = -1);
 
+    /*
+     * Retorna o conn_fd do socket
+     */
     int Get_conn_fd();
 
+    /*
+     * Atualiza o nickname do usuário desse socket
+     * @params nickname: novo nome
+     */
     void Update_nickname(string nickname);
 
     /*
@@ -109,8 +117,6 @@ public:
      * Checa se há um erro e, caso haja, encerra o programa 
      */
     void Check();
-
-    string Get_ip();
 };
 
 #endif

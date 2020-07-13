@@ -9,6 +9,7 @@ pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
 map<string, int> channels;
 map<string, vector<int>> channels_permissions;
 
+// Classe que representa um Client
 class Client {
 public:
     int id;
@@ -34,6 +35,7 @@ public:
     }
 };
 
+// Classe que representa Clients ativos
 class ActiveClients {
 public:
     vector<Client> clients;
@@ -105,14 +107,12 @@ void send_message(string message, int speaker) {
 }
 
 // Manda mensagem para todos os clientes
-// Conectados
+// Conectados no mesmo canal
 void spread_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
     
-    string name;
-    
     int pos = active->find(speaker);
-    name = active->clients[pos].name + "#" + to_string(active->clients[pos].id) + ": ";
+    string name = active->clients[pos].name + "#" + to_string(active->clients[pos].id) + ": ";
     
     if (active->clients[pos].channel_name == "$") {
         send_message("Please, join a channel", speaker);
@@ -150,7 +150,8 @@ void spread_message(string message, int speaker) {
     pthread_mutex_unlock(&lock);
 }
 
-// Thread para iteragir com o cliente
+// Thread para iteragir com o cliente, checando se as mensagens
+// Tem comandos especiais que devem ser executados pelo servidor
 void* server_thread(void* arg) {    
     int failed = 0;
     bool quit = false;
@@ -192,6 +193,8 @@ void* server_thread(void* arg) {
             int pos = active->find(new_client);
             bool is_admin = (channels[channel_name] == 0);
             
+            // Checa se cliente tem permissão para entrar no canal
+            // isto é, se ele é admin ou foi convidado
             if(channel_name[0] == '&' and !is_admin){
                 auto permissions = channels_permissions[channel_name];
                 auto can_join = find(permissions.begin(), permissions.end(), new_client) != permissions.end();
@@ -216,6 +219,9 @@ void* server_thread(void* arg) {
             channels[channel_name]++;
 
         } else if (message.size() >= 6 && message.substr(0, 5) == "/kick") {
+            // O /kick só pode ser utilizado pelo admin e expulsa um client
+            // momentaneamente do canal. O client pode voltar ao canal sem problemas.
+
             int pos_client = active->find(new_client);
             
             if (active->clients[pos_client].is_admin == false) {
@@ -235,7 +241,6 @@ void* server_thread(void* arg) {
             active->clients[pos].is_admin = false;
             channels[active->clients[pos_client].channel_name]--;
             
-
         } else if (message.size() >= 6 && message.substr(0, 5) == "/mute") {
             int pos_client = active->find(new_client);
             
@@ -260,7 +265,8 @@ void* server_thread(void* arg) {
             if (active->clients[pos_client].is_admin == false) {
                 send_message("The Force is not with you!!", new_client);
                 continue;
-            } 
+            }
+
             string to_be_kicked = message.substr(8, message.size());
             int pos = active->find(active->clients[pos_client].channel_name, to_be_kicked);
 
@@ -271,7 +277,6 @@ void* server_thread(void* arg) {
 
             send_message("You have your voice again, use it wisely", active->clients[pos].conn);
             active->clients[pos].is_muted = false;
-            
                
         } else if (message.size() >= 7 && message.substr(0, 6) == "/whois") {
             int pos_client = active->find(new_client);
@@ -309,7 +314,11 @@ void* server_thread(void* arg) {
 
             send_message("Admin wants to have the pleasure of your company at " + active->clients[pos_client].channel_name + ". To join this channel, type /join " + active->clients[pos_client].channel_name, active->clients[pos].conn);
             send_message("Invite sent!", new_client);
+            
+            // adiciona permissão para o cliente convidado entrar no canal
+            // assim, ele pode entrar a qualquer momento após o convite
             channels_permissions[active->clients[pos_client].channel_name].push_back(active->clients[pos].conn);
+        
         } else {
             spread_message(message, new_client);
         }
@@ -347,7 +356,6 @@ int main(int argc, char* argv[]) {
         
         cout << "New client: " << nickname << endl;
         active->insert(new_client, nickname, ip);
-        cout << "Done" << endl;
 
         if (pthread_create(&tid, NULL, server_thread, &new_client) != 0)
             cout << "Failed to create thread" << endl;
