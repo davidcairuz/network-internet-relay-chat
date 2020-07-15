@@ -42,49 +42,38 @@ public:
     int curr_id = 0;
     ActiveClients(){}
 
-    void insert(int conn, string name, string ip){
+    void insert(int conn, string name, string ip) {
         pthread_mutex_lock(&lock);
         Client new_client = Client(curr_id++, conn, name, ip);
         clients.push_back(new_client);
-    
-        cout << "Active clients: \n";
-        for (unsigned int i = 0; i < clients.size(); i++) {
-            cout << '\t' << clients[i].id << endl;
-        }
-
         pthread_mutex_unlock(&lock);
     }
 
-    int find(int conn){
+    // busca por conn id
+    int find(int conn) {
         for (unsigned int pos = 0; pos < clients.size(); pos++) 
             if(clients[pos].conn == conn) return pos;
         return -1;
     }
 
-    int find(string name){
+    // busca por nome
+    int find(string name) {
         for (unsigned int pos = 0; pos < clients.size(); pos++) 
             if(clients[pos].name == name) return pos;
         return -1;
     }
 
-    int find(string channel, string name){
+    // busca por nome em um canal específico
+    int find(string channel, string name) {
         for(unsigned int pos = 0; pos < clients.size(); pos++) 
             if(clients[pos].name == name && clients[pos].channel_name == channel) return pos;
         return -1;
     }
 
     void remove(int conn) {
-        pthread_mutex_lock(&lock);
-    
+        pthread_mutex_lock(&lock);    
         int pos = find(conn);
-
         clients.erase(clients.begin() + pos);
-
-        cout << " Active clients: \n";
-        for (unsigned int i = 0; i < clients.size(); i++) {
-            cout << '\t' << clients[i].id << endl;
-        }
-
         pthread_mutex_unlock(&lock);
     }
 };
@@ -107,7 +96,8 @@ void send_message(string message, int speaker) {
 }
 
 // Manda mensagem para todos os clientes
-// Conectados no mesmo canal
+// Conectados no mesmo canal, desde que o 
+// Speaker esteja em um canal e não esteja mutado
 void spread_message(string message, int speaker) {
     pthread_mutex_lock(&lock);
     
@@ -133,8 +123,11 @@ void spread_message(string message, int speaker) {
         int conn = client.conn;
 
         int receiver = active->find(conn);
+
+        // checa canal do destinatário
         if (active->clients[receiver].channel_name != active->clients[pos].channel_name) continue;
 
+        // envia batches da mensagem
         for (int i = 0; (unsigned int)i < message.size(); i += max_len) {
             string actual_message = name + message.substr(i, max_len);
             
@@ -194,7 +187,8 @@ void* server_thread(void* arg) {
             bool is_admin = (channels[channel_name] == 0);
             
             // Checa se cliente tem permissão para entrar no canal
-            // isto é, se ele é admin ou foi convidado
+            // isto é, se ele é admin ou foi convidado. O cliente
+            // só pode estar em um canal por vez
             if(channel_name[0] == '&' and !is_admin){
                 auto permissions = channels_permissions[channel_name];
                 auto can_join = find(permissions.begin(), permissions.end(), new_client) != permissions.end();
@@ -228,6 +222,7 @@ void* server_thread(void* arg) {
                 send_message("You can't be that bad!", new_client);
                 continue;
             }
+
             string to_be_kicked = message.substr(6, message.size());
             int pos = active->find(active->clients[pos_client].channel_name, to_be_kicked);
 
@@ -248,6 +243,7 @@ void* server_thread(void* arg) {
                 send_message("The Force is not with you!!", new_client);
                 continue;
             } 
+            
             string to_be_kicked = message.substr(6, message.size());
             int pos = active->find(active->clients[pos_client].channel_name, to_be_kicked);
 

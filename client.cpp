@@ -14,7 +14,7 @@ void Sigint_handler(int sig_num) {
     fflush(stdout);
 }
 
-// checa se nome do canal está correto segundo as regras do RFC
+// Checa se nome do canal está correto segundo as regras do RFC
 bool check_channel_name(string name){
     if(name.size() == 0 or name.size() > 200) return false;
     if(name[0] != '#' and name[0] != '&') return false;
@@ -55,6 +55,7 @@ string get_nickname() {
         exit(0);
     }
     
+    // espera nome válido
     while (!check_username(nickname)) {
         cout << "Type a valid username (a-z, A-Z, ., _, -, size > 2): ";
         if(!getline(cin, nickname)) {
@@ -121,6 +122,7 @@ void* client_send_thread(void* arg) {
             message = "/quit";
         }
 
+        // checa mensagens especiais
         if (message == "/menu") {
             cout << get_menu();
             continue;
@@ -147,6 +149,7 @@ void* client_send_thread(void* arg) {
             }
         }
 
+        // envia cada catch da mesagem
         for (int i = 0; (unsigned int)i < message.size(); i += Socket::buffer_size) {
             client_socket->Write(message.substr(i, Socket::buffer_size));
             client_socket->Check();
@@ -183,6 +186,7 @@ int main(int argc, char* argv[]) {
     nickname = get_nickname();
     cout << get_menu();
 
+    // menu enquanto desconectado
     while (command != "/connect") {
         if(!getline(cin, command, '\n')) {
             cout << "quitting" << endl;
@@ -230,7 +234,7 @@ int main(int argc, char* argv[]) {
         return 1;
     }
 
-    while (!quit); // Checa aqui sem problemas
+    while (!quit);
 
     cout << "É nois flw vlw" << endl;
     return 0;
